@@ -9,6 +9,7 @@ from coevolution.core.interfaces import (
     PopulationConfig,
     Problem,
 )
+from coevolution.populations.initializer_registry import initializer_registry
 from coevolution.core.interfaces.language import (
     ICodeParser,
     LanguageParsingError,
@@ -25,6 +26,7 @@ from coevolution.strategies.llm_base import (
 from .edit import AgentCoderEditOperator
 
 
+@initializer_registry.register("agent_coder", population="code")
 class AgentCoderInitializer(BaseLLMInitializer[CodeIndividual]):
     """Turn 0 of the AgentCoder loop: generates the first solution and seeds history.
 

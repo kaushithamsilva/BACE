@@ -1,9 +1,16 @@
 """Differential population profile factory."""
 
 from __future__ import annotations
+from typing import Any
 
 from coevolution.core.individual import TestIndividual
-from coevolution.core.interfaces import BayesianConfig, PopulationConfig, RegisteredInitializer, TestProfile, WeightedPopulationInitializer
+from coevolution.core.interfaces import (
+    BayesianConfig,
+    IPopulationInitializer,
+    PopulationConfig,
+    TestProfile,
+)
+from coevolution.populations.initializer_registry import initializer_registry
 from coevolution.core.interfaces.language import ILanguage
 from coevolution.strategies.breeding.breeder import Breeder
 from coevolution.core.interfaces.operators import RegisteredOperator
@@ -18,7 +25,8 @@ from infrastructure.sandbox.types import SandboxConfig
 from ..registry import registry
 from .finder import DifferentialFinder
 from .operators.discovery import DifferentialDiscoveryOperator
-from .operators.initializer import DifferentialInitializer
+# Initializers imported here to ensure decorators are run
+from .operators.initializer import DifferentialInitializer  # noqa: F401
 from .operators.llm_operator import DifferentialLLMOperator
 from .selector import FunctionallyEqSelector
 
@@ -44,6 +52,7 @@ def create_differential_test_profile(
     diversity_enabled: bool = True,
     max_pairs_per_group: int = 5,
     num_passing_tests_to_sample: int = 5,
+    **initializer_config: Any,
 ) -> TestProfile:
     """Create a differential test population profile."""
     # Split cpu_workers budget across two parallelism levels so total OS
@@ -110,19 +119,13 @@ def create_differential_test_profile(
         llm_workers=1,  # Phase 2 parallelism handled internally by the operator
     )
 
-    initializer: WeightedPopulationInitializer[TestIndividual] = (
-        WeightedPopulationInitializer(
-            registered_initializers=[
-                RegisteredInitializer(
-                    weight=1.0,
-                    initializer=DifferentialInitializer(
-                        llm=llm_client,
-                        parser=language_adapter.parser,
-                        language_name=language_adapter.language,
-                        pop_config=population_config,
-                    ),
-                )
-            ],
+    initializer: IPopulationInitializer[TestIndividual] = (
+        initializer_registry.build_weighted_initializer(
+            population="differential",
+            config=initializer_config,
+            llm=llm_client,
+            parser=language_adapter.parser,
+            language_name=language_adapter.language,
             pop_config=population_config,
         )
     )

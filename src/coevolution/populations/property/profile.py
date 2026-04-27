@@ -1,9 +1,16 @@
 """Property test population profile factory."""
 
 from __future__ import annotations
+from typing import Any
 
 from coevolution.core.individual import TestIndividual
-from coevolution.core.interfaces import BayesianConfig, PopulationConfig, RegisteredInitializer, TestProfile, WeightedPopulationInitializer
+from coevolution.core.interfaces import (
+    BayesianConfig,
+    IPopulationInitializer,
+    PopulationConfig,
+    TestProfile,
+)
+from coevolution.populations.initializer_registry import initializer_registry
 from coevolution.core.interfaces.language import ILanguage
 from coevolution.strategies.breeding.breeder import Breeder
 from coevolution.core.interfaces.operators import RegisteredOperator
@@ -17,7 +24,7 @@ from infrastructure.sandbox import SandboxConfig
 
 from ..registry import registry
 from .evaluator import PropertyTestEvaluator
-from .operators import AdversarialPropertyRefiner, PropertyTestInitializer
+from .operators import AdversarialPropertyRefiner, PropertyTestInitializer  # noqa: F401
 from .operators.noop import NoOpOperator
 from .types import IOPairCache
 
@@ -40,6 +47,7 @@ def create_property_test_profile(
     cpu_workers: int = 4,
     enable_multiprocessing: bool = True,
     num_inputs: int = 20,
+    **initializer_config: Any,
 ) -> TestProfile:
     """Create a complete property test population profile."""
     # ... (function body)
@@ -57,23 +65,16 @@ def create_property_test_profile(
     io_pair_cache = IOPairCache()
 
     # ── Initializer ──────────────────────────────────────────────────────────
-    initializer: WeightedPopulationInitializer[TestIndividual] = (
-        WeightedPopulationInitializer(
-            registered_initializers=[
-                RegisteredInitializer(
-                    weight=1.0,
-                    initializer=PropertyTestInitializer(
-                        llm=llm_client,
-                        parser=python_parser,
-                        language_name=language_adapter.language,
-                        pop_config=pop_config,
-                        sandbox_config=sandbox_config,
-                        io_pair_cache=io_pair_cache,
-                        llm_workers=llm_client.workers,
-                    ),
-                )
-            ],
+    initializer: IPopulationInitializer[TestIndividual] = (
+        initializer_registry.build_weighted_initializer(
+            population="property",
+            config=initializer_config,
+            llm=llm_client,
+            parser=python_parser,
+            language_name=language_adapter.language,
             pop_config=pop_config,
+            sandbox_config=sandbox_config,
+            io_pair_cache=io_pair_cache,
         )
     )
 

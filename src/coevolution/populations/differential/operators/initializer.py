@@ -8,8 +8,10 @@ from coevolution.core.interfaces import Problem
 from coevolution.core.individual import TestIndividual
 
 from coevolution.strategies.llm_base import BaseLLMInitializer
+from coevolution.populations.initializer_registry import initializer_registry
 
 
+@initializer_registry.register("standard", population="differential")
 class DifferentialInitializer(BaseLLMInitializer[TestIndividual]):
     """Differential tests start empty — Gen 0 is always []."""
 

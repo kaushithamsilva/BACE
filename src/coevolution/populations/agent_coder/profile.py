@@ -1,13 +1,16 @@
 """AgentCoder population profile factory."""
 
 from __future__ import annotations
+from typing import Any
 
 from coevolution.core.individual import CodeIndividual
 from coevolution.core.interfaces import (
     CodeProfile,
     IEliteSelectionStrategy,
+    IPopulationInitializer,
     PopulationConfig,
 )
+from coevolution.populations.initializer_registry import initializer_registry
 from coevolution.core.interfaces.language import ILanguage
 from infrastructure.llm_client import LLMClient
 
@@ -20,7 +23,8 @@ from coevolution.strategies.selection.parent_selection import (
 )
 
 from .operators.edit import AgentCoderEditOperator
-from .operators.initializer import AgentCoderInitializer
+# Initializers imported here to ensure decorators are run
+from .operators.initializer import AgentCoderInitializer  # noqa: F401
 
 
 from ..registry import registry
@@ -33,6 +37,7 @@ def create_agent_coder_code_profile(
     # ... (rest of parameters)
     initial_prior: float = 0.2,
     prob_assigner_strategy: str = "min",
+    **initializer_config: Any,
 ) -> CodeProfile:
     """Create an AgentCoder (iterative repair) code profile."""
     # ... (function body)
@@ -65,12 +70,16 @@ def create_agent_coder_code_profile(
         llm_workers=llm_client.workers,
     )
 
-    initializer = AgentCoderInitializer(
-        llm=llm_client,
-        parser=language_adapter.parser,
-        language_name=language_adapter.language,
-        pop_config=population_config,
-        edit_operator=edit_op,  # shares conversation history
+    initializer: IPopulationInitializer[CodeIndividual] = (
+        initializer_registry.build_weighted_initializer(
+            population="code",
+            config=initializer_config,
+            llm=llm_client,
+            parser=language_adapter.parser,
+            language_name=language_adapter.language,
+            pop_config=population_config,
+            edit_operator=edit_op,
+        )
     )
 
     elite_selector: IEliteSelectionStrategy[CodeIndividual] = TopKEliteSelector()

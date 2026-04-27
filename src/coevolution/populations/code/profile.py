@@ -1,6 +1,7 @@
 """Code population profile factory."""
 
 from __future__ import annotations
+from typing import Any
 
 from coevolution.core.individual import CodeIndividual
 from coevolution.core.interfaces import (
@@ -8,9 +9,8 @@ from coevolution.core.interfaces import (
     IEliteSelectionStrategy,
     IPopulationInitializer,
     PopulationConfig,
-    RegisteredInitializer,
-    WeightedPopulationInitializer,
 )
+from coevolution.populations.initializer_registry import initializer_registry
 from coevolution.core.interfaces.language import ILanguage
 from infrastructure.llm_client import LLMClient
 
@@ -29,9 +29,10 @@ from coevolution.strategies.selection.parent_selection import (
 from .operators.mutation import CodeMutationOperator
 from .operators.crossover import CodeCrossoverOperator
 from .operators.edit import CodeGenericEditOperator
+# Initializers imported here to ensure decorators are run
 from .operators.initializer import (
-    PlanningCodeInitializer,
-    StandardCodeInitializer,
+    PlanningCodeInitializer,  # noqa: F401
+    StandardCodeInitializer,  # noqa: F401
 )
 
 
@@ -55,17 +56,11 @@ def create_default_code_profile(
     diversity_enabled: bool = True,
     prob_assigner_strategy: str = "min",
     k_failing_tests: int = 10,
-    standard_init_rate: float = 1.0,
-    planning_init_rate: float = 0.0,
+    **initializer_config: Any,
 ) -> CodeProfile:
     """Create a standard code population profile."""
     # ... (function body)
-    if standard_init_rate < 0 or planning_init_rate < 0:
-        raise ValueError("Init rates must be non-negative.")
-    if standard_init_rate + planning_init_rate == 0:
-        raise ValueError(
-            "At least one of standard_init_rate or planning_init_rate must be > 0."
-        )
+    # Component initialization delegated to registry
 
     total_rate = mutation_rate + crossover_rate + generic_edit_rate
     if not (0.99 <= total_rate <= 1.01):
@@ -123,38 +118,16 @@ def create_default_code_profile(
         llm_workers=llm_client.workers,
     )
 
-    registered_inits: list[RegisteredInitializer[CodeIndividual]] = []
-    if standard_init_rate > 0:
-        registered_inits.append(
-            RegisteredInitializer(
-                weight=standard_init_rate,
-                initializer=StandardCodeInitializer(
-                    llm=llm_client,
-                    parser=language_adapter.parser,
-                    language_name=language_adapter.language,
-                    pop_config=population_config,
-                    init_batch_size=init_pop_batch_size,
-                    llm_workers=llm_client.workers,
-                ),
-            )
+    initializer: IPopulationInitializer[CodeIndividual] = (
+        initializer_registry.build_weighted_initializer(
+            population="code",
+            config=initializer_config,
+            llm=llm_client,
+            parser=language_adapter.parser,
+            language_name=language_adapter.language,
+            pop_config=population_config,
+            init_pop_batch_size=init_pop_batch_size,
         )
-    if planning_init_rate > 0:
-        registered_inits.append(
-            RegisteredInitializer(
-                weight=planning_init_rate,
-                initializer=PlanningCodeInitializer(
-                    llm=llm_client,
-                    parser=language_adapter.parser,
-                    language_name=language_adapter.language,
-                    pop_config=population_config,
-                    llm_workers=llm_client.workers,
-                ),
-            )
-        )
-
-    initializer: IPopulationInitializer[CodeIndividual] = WeightedPopulationInitializer(
-        registered_initializers=registered_inits,
-        pop_config=population_config,
     )
 
     elite_selector: IEliteSelectionStrategy[CodeIndividual] = (

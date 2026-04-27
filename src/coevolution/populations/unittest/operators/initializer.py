@@ -10,6 +10,7 @@ from coevolution.core.interfaces import (
     PopulationConfig,
     Problem,
 )
+from coevolution.populations.initializer_registry import initializer_registry
 from coevolution.core.interfaces.language import (
     ICodeParser,
     LanguageParsingError,
@@ -26,6 +27,7 @@ from coevolution.strategies.llm_base import (
 from ._helpers import _TestLLMHelpers
 
 
+@initializer_registry.register("standard", population="unittest")
 class UnittestInitializer(_TestLLMHelpers, BaseLLMInitializer[TestIndividual]):
     """Creates Gen-0 test individuals via LLM.
 

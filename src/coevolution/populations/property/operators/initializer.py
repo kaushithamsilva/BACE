@@ -23,9 +23,11 @@ from infrastructure.sandbox import SandboxConfig, create_sandbox
 
 from ..types import IOPairCache
 from .helpers import transform_public_tests
+from coevolution.populations.initializer_registry import initializer_registry
 from .validator import validate_property_test
 
 
+@initializer_registry.register("standard", population="property")
 class PropertyTestInitializer(BaseLLMInitializer[TestIndividual]):
     """Creates Gen-0 property test individuals via two LLM calls.
 

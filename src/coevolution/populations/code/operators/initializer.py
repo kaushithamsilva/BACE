@@ -25,6 +25,7 @@ from coevolution.strategies.llm_base import (
     llm_retry,
 )
 
+from coevolution.populations.initializer_registry import initializer_registry
 from ._helpers import _CodeLLMHelpers
 
 
@@ -48,6 +49,7 @@ class BaseCodeInitializer(_CodeLLMHelpers, BaseLLMInitializer[CodeIndividual], A
         ...
 
 
+@initializer_registry.register("standard", population="code")
 class StandardCodeInitializer(BaseCodeInitializer):
     """Creates Gen-0 code individuals via batched LLM calls."""
 
@@ -136,6 +138,7 @@ class StandardCodeInitializer(BaseCodeInitializer):
         return individuals[:target]
 
 
+@initializer_registry.register("planning", population="code")
 class PlanningCodeInitializer(BaseCodeInitializer):
     """Two-phase: plan per individual, then code from plan."""
 

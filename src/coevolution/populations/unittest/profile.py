@@ -1,16 +1,17 @@
 """Unittest population profile factories."""
 
 from __future__ import annotations
+from typing import Any
 
 from coevolution.core.individual import TestIndividual
 from coevolution.core.interfaces import (
     BayesianConfig,
+    IPopulationInitializer,
     PopulationConfig,
     PublicTestProfile,
-    RegisteredInitializer,
     TestProfile,
-    WeightedPopulationInitializer,
 )
+from coevolution.populations.initializer_registry import initializer_registry
 from coevolution.core.interfaces.language import ILanguage
 from coevolution.strategies.breeding.breeder import Breeder
 from coevolution.core.interfaces.operators import RegisteredOperator
@@ -24,7 +25,8 @@ from infrastructure.llm_client import LLMClient
 from ..registry import registry
 from .operators.crossover import UnittestCrossoverOperator
 from .operators.edit import UnittestEditOperator
-from .operators.initializer import UnittestInitializer
+# Initializers imported here to ensure decorators are run
+from .operators.initializer import UnittestInitializer  # noqa: F401
 from .operators.mutation import UnittestMutationOperator
 
 
@@ -47,6 +49,7 @@ def create_unittest_test_profile(
     learning_rate: float = 0.05,
     prob_assigner_strategy: str = "min",
     diversity_enabled: bool = True,
+    **initializer_config: Any,
 ) -> TestProfile:
     """Create a unittest test population profile."""
     # ... (function body)
@@ -101,20 +104,13 @@ def create_unittest_test_profile(
         llm_workers=llm_client.workers,
     )
 
-    initializer: WeightedPopulationInitializer[TestIndividual] = (
-        WeightedPopulationInitializer(
-            registered_initializers=[
-                RegisteredInitializer(
-                    weight=1.0,
-                    initializer=UnittestInitializer(
-                        llm=llm_client,
-                        parser=language_adapter.parser,
-                        language_name=language_adapter.language,
-                        pop_config=population_config,
-                        llm_workers=llm_client.workers,
-                    ),
-                )
-            ],
+    initializer: IPopulationInitializer[TestIndividual] = (
+        initializer_registry.build_weighted_initializer(
+            population="unittest",
+            config=initializer_config,
+            llm=llm_client,
+            parser=language_adapter.parser,
+            language_name=language_adapter.language,
             pop_config=population_config,
         )
     )
