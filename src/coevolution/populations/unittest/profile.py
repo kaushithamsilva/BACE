@@ -24,7 +24,7 @@ from coevolution.strategies.selection.parent_selection import (
 )
 from infrastructure.llm_client import LLMClient
 
-from ..registries import registry
+from ..registries import profile_registry
 # Operators/Initializers imported here to ensure decorators are run
 from .operators.crossover import UnittestCrossoverOperator  # noqa: F401
 from .operators.edit import UnittestEditOperator  # noqa: F401
@@ -32,7 +32,7 @@ from .operators.initializer import UnittestInitializer  # noqa: F401
 from .operators.mutation import UnittestMutationOperator  # noqa: F401
 
 
-@registry.test_factory("unittest")
+@profile_registry.test_factory("unittest")
 def create_unittest_test_profile(
     llm_client: LLMClient,
     language_adapter: ILanguage,
@@ -120,7 +120,7 @@ def create_unittest_test_profile(
     )
 
 
-@registry.public_factory("public")
+@profile_registry.public_factory("public")
 def create_public_test_profile(
     alpha: float = 0.001,
     beta: float = 0.1,

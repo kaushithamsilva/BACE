@@ -24,7 +24,7 @@ from coevolution.strategies.selection.parent_selection import (
 from infrastructure.llm_client import LLMClient
 from infrastructure.sandbox.types import SandboxConfig
 
-from ..registries import registry
+from ..registries import profile_registry
 from .finder import DifferentialFinder
 # Operators/Initializers imported here to ensure decorators are run
 from .operators.discovery import DifferentialDiscoveryOperator  # noqa: F401
@@ -34,7 +34,7 @@ from .operators.llm_operator import DifferentialLLMOperator
 from .selector import FunctionallyEqSelector
 
 
-@registry.test_factory("differential")
+@profile_registry.test_factory("differential")
 def create_differential_test_profile(
     llm_client: LLMClient,
     language_adapter: ILanguage,

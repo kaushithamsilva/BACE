@@ -38,10 +38,10 @@ from .operators.initializer import (
 )
 
 
-from ..registries import registry
+from ..registries import profile_registry
 
 
-@registry.code_factory("default")
+@profile_registry.code_factory("default")
 def create_default_code_profile(
     llm_client: LLMClient,
     language_adapter: ILanguage,

@@ -25,7 +25,7 @@ from coevolution.strategies.selection.parent_selection import (
 from infrastructure.llm_client import LLMClient
 from infrastructure.sandbox import SandboxConfig
 
-from ..registries import registry
+from ..registries import profile_registry
 from .evaluator import PropertyTestEvaluator
 # Operators/Initializers imported here to ensure decorators are run
 from .operators import AdversarialPropertyRefiner, PropertyTestInitializer  # noqa: F401
@@ -33,7 +33,7 @@ from .operators.noop import NoOpOperator  # noqa: F401
 from .types import IOPairCache
 
 
-@registry.test_factory("property")
+@profile_registry.test_factory("property")
 def create_property_test_profile(
     llm_client: LLMClient,
     language_adapter: ILanguage,

@@ -108,4 +108,3 @@ class ProfileRegistry:
 
 # Global registry instance
 profile_registry = ProfileRegistry()
-registry = profile_registry

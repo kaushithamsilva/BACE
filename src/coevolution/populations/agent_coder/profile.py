@@ -30,10 +30,10 @@ from .operators.edit import AgentCoderEditOperator  # noqa: F401
 from .operators.initializer import AgentCoderInitializer  # noqa: F401
 
 
-from ..registries import registry
+from ..registries import profile_registry
 
 
-@registry.code_factory("agent_coder")
+@profile_registry.code_factory("agent_coder")
 def create_agent_coder_code_profile(
     llm_client: LLMClient,
     language_adapter: ILanguage,

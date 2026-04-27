@@ -34,7 +34,7 @@ Each operator and initializer should use the central registries for discovery an
 #### Operator Example:
 ```python
 # populations/<name>/operators/mutation.py
-from coevolution.populations.operator_registry import operator_registry
+from coevolution.populations.registries import operator_registry
 
 @operator_registry.register("mutation", population="<name>")
 class <Name>MutationOperator(BaseLLMOperator[<Individual>]):
@@ -44,7 +44,7 @@ class <Name>MutationOperator(BaseLLMOperator[<Individual>]):
 #### Initializer Example:
 ```python
 # populations/<name>/operators/initializer.py
-from coevolution.populations.initializer_registry import initializer_registry
+from coevolution.populations.registries import initializer_registry
 
 @initializer_registry.register("standard", population="<name>")
 class <Name>Initializer(BaseLLMInitializer[<Individual>]):
@@ -57,11 +57,13 @@ The factory function is responsible for high-level population configuration and 
 ```python
 # populations/<name>/profile.py
 from coevolution.core.interfaces import CodeProfile, PopulationConfig
-from coevolution.populations.initializer_registry import initializer_registry
-from coevolution.populations.operator_registry import operator_registry
-from ..registry import registry
+from coevolution.populations.registries import (
+    profile_registry, 
+    initializer_registry, 
+    operator_registry
+)
 
-@registry.code_factory("<name>")  # or @registry.test_factory("<name>")
+@profile_registry.code_factory("<name>")  # or @profile_registry.test_factory("<name>")
 def create_<name>_profile(llm_client, language_adapter, **factory_config) -> CodeProfile:
     pop_config = PopulationConfig(...)
     
@@ -70,21 +72,20 @@ def create_<name>_profile(llm_client, language_adapter, **factory_config) -> Cod
         population="<name>",
         config=factory_config,
         llm=llm_client,
-        ...
+        pop_config=pop_config
     )
     
     breeder = operator_registry.build_weighted_breeder(
         population="<name>",
         config=factory_config,
         llm=llm_client,
-        ...
+        parent_selector=...
     )
     
     return CodeProfile(
         population_config=pop_config,
         initializer=initializer,
-        breeder=breeder,
-        ...
+        breeder=breeder
     )
 ```
 
@@ -101,5 +102,8 @@ Add `from . import <name>` to `src/coevolution/populations/__init__.py`.
 - [ ] Initializer/Operators implement their logic and use `@*_registry.register`
 - [ ] `operators/__init__.py` imports all operator implementations
 - [ ] `profile.py` uses registries to build `initializer` and `breeder`
-- [ ] `populations/__init__.py` imports the new package
+- [ ] `src/coevolution/populations/__init__.py` imports the new package
 - [ ] Config rates (e.g. `standard_init_rate: 1.0`, `mutation_rate: 1.0`) added to experiment YAML.
+
+> [!NOTE]
+> You do **not** need to modify the `profile.py` factory function for standard parameters. The registry handles discovery, instantiation, and weighting automatically.
