@@ -24,3 +24,6 @@ num_passing_tests_to_sample: 5  # Number of passing test cases to randomly sampl
 
 # Probability assigner strategy: one of ["min", "mean", "max", "init"]
 prob_assigner_strategy: "min"
+
+# Initializer rates
+differential_init_rate: 1.0

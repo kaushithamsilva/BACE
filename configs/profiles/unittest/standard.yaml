@@ -23,3 +23,6 @@ diversity_enabled: true
 
 # Probability assigner strategy: one of ["min", "mean", "max", "init"]
 prob_assigner_strategy: "min"
+
+# Initializer rates
+unittest_init_rate: 1.0
