@@ -6,12 +6,10 @@ from .llm_operator import (
     DifferentialInputOutput,
 )
 from .discovery import DifferentialDiscoveryOperator
-from .initializer import DifferentialInitializer
 
 __all__ = [
     "DifferentialLLMOperator",
     "DifferentialGenScriptInput",
     "DifferentialInputOutput",
     "DifferentialDiscoveryOperator",
-    "DifferentialInitializer",
 ]

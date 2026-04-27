@@ -15,8 +15,8 @@ from .operators import (
     DifferentialGenScriptInput,
     DifferentialInputOutput,
     DifferentialDiscoveryOperator,
-    DifferentialInitializer,
 )
+from .initializers import DifferentialInitializer
 
 __all__ = [
     "create_differential_test_profile",

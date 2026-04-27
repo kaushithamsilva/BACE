@@ -32,9 +32,8 @@ from coevolution.strategies.selection.parent_selection import (
 from .operators.mutation import CodeMutationOperator  # noqa: F401
 from .operators.crossover import CodeCrossoverOperator  # noqa: F401
 from .operators.edit import CodeGenericEditOperator  # noqa: F401
-from .operators.initializer import (
-    PlanningCodeInitializer,  # noqa: F401
-    StandardCodeInitializer,  # noqa: F401
+from .initializers import (
+    DirectCodeInitializer,  # noqa: F401
 )
 
 

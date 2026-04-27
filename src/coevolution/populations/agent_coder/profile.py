@@ -27,7 +27,7 @@ from coevolution.strategies.selection.parent_selection import (
 
 # Operators/Initializers imported here to ensure decorators are run
 from .operators.edit import AgentCoderEditOperator  # noqa: F401
-from .operators.initializer import AgentCoderInitializer  # noqa: F401
+from .initializers import AgentCoderInitializer  # noqa: F401
 
 
 from ..registries import profile_registry

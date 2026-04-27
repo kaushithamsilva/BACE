@@ -56,10 +56,9 @@ class RegisteredInitializer[T: BaseIndividual]:
     Weights do not need to sum to 1.0; ``WeightedPopulationInitializer``
     normalises them internally.
 
-    Example::
+        Example::
 
-        RegisteredInitializer(weight=0.5, initializer=StandardCodeInitializer(...))
-        RegisteredInitializer(weight=0.5, initializer=PlanningCodeInitializer(...))
+        RegisteredInitializer(weight=1.0, initializer=DirectCodeInitializer(...))
     """
 
     weight: float
@@ -90,8 +89,7 @@ class WeightedPopulationInitializer[T: BaseIndividual]:
 
         WeightedPopulationInitializer(
             registered_initializers=[
-                RegisteredInitializer(weight=0.5, initializer=StandardCodeInitializer(...)),
-                RegisteredInitializer(weight=0.5, initializer=PlanningCodeInitializer(...)),
+                RegisteredInitializer(weight=1.0, initializer=DirectCodeInitializer(...)),
             ],
             pop_config=population_config,
         )

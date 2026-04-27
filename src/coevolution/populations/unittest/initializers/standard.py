@@ -24,7 +24,7 @@ from coevolution.strategies.llm_base import (
     LLMSyntaxError,
     llm_retry,
 )
-from ._helpers import _TestLLMHelpers
+from ..operators._helpers import _TestLLMHelpers
 
 
 @initializer_registry.register("standard", population="unittest")

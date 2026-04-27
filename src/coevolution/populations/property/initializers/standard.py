@@ -22,9 +22,9 @@ from infrastructure.languages import PythonLanguage
 from infrastructure.sandbox import SandboxConfig, create_sandbox
 
 from ..types import IOPairCache
-from .helpers import transform_public_tests
+from ..operators.helpers import transform_public_tests
 from coevolution.populations.registries import initializer_registry
-from .validator import validate_property_test
+from ..operators.validator import validate_property_test
 
 
 @initializer_registry.register("standard", population="property")

@@ -29,7 +29,7 @@ from .finder import DifferentialFinder
 # Operators/Initializers imported here to ensure decorators are run
 from .operators.discovery import DifferentialDiscoveryOperator  # noqa: F401
 # Initializers imported here to ensure decorators are run
-from .operators.initializer import DifferentialInitializer  # noqa: F401
+from .initializers import DifferentialInitializer  # noqa: F401
 from .operators.llm_operator import DifferentialLLMOperator
 from .selector import FunctionallyEqSelector
 

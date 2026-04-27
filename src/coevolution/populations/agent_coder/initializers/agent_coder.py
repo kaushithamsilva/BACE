@@ -23,7 +23,7 @@ from coevolution.strategies.llm_base import (
     LLMSyntaxError,
     llm_retry,
 )
-from .edit import AgentCoderEditOperator
+from ..operators.edit import AgentCoderEditOperator
 
 
 @initializer_registry.register("agent_coder", population="agent_coder")

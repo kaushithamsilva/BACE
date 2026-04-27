@@ -5,8 +5,8 @@ from .operators import (
     UnittestMutationOperator,
     UnittestCrossoverOperator,
     UnittestEditOperator,
-    UnittestInitializer,
 )
+from .initializers import UnittestInitializer
 
 __all__ = [
     "create_unittest_test_profile",

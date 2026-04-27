@@ -28,7 +28,7 @@ from ..registries import profile_registry
 # Operators/Initializers imported here to ensure decorators are run
 from .operators.crossover import UnittestCrossoverOperator  # noqa: F401
 from .operators.edit import UnittestEditOperator  # noqa: F401
-from .operators.initializer import UnittestInitializer  # noqa: F401
+from .initializers import UnittestInitializer  # noqa: F401
 from .operators.mutation import UnittestMutationOperator  # noqa: F401
 
 
