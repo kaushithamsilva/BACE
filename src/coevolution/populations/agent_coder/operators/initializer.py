@@ -45,7 +45,7 @@ class AgentCoderInitializer(BaseLLMInitializer[CodeIndividual]):
             raise ValueError("AgentCoder only supports initial_population_size=1")
         self._edit_operator = edit_operator
 
-    def initialize(self, problem: Problem) -> list[CodeIndividual]:
+    def initialize(self, problem: Problem, size: int | None = None) -> list[CodeIndividual]:
         self._edit_operator.reset_session()
         return [self._generate_initial(problem)]
 

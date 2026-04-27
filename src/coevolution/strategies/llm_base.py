@@ -19,10 +19,13 @@ from tenacity import (
     wait_exponential,
 )
 
-from coevolution.core.interfaces.base import BaseIndividual
-from coevolution.core.interfaces.config import PopulationConfig
-from coevolution.core.interfaces.context import CoevolutionContext
-from coevolution.core.interfaces.initializer import IPopulationInitializer
+from coevolution.core.interfaces import (
+    BaseIndividual,
+    CoevolutionContext,
+    IPopulationInitializer,
+    PopulationConfig,
+    Problem,
+)
 from coevolution.core.interfaces.language import ICodeParser
 from coevolution.core.interfaces.operators import IOperator
 from coevolution.core.interfaces.probability import IProbabilityAssigner
@@ -173,7 +176,7 @@ class BaseLLMInitializer[T: BaseIndividual](
         self.pop_config = pop_config
 
     @abstractmethod
-    def initialize(self, problem: Any) -> list[T]: ...
+    def initialize(self, problem: Problem, size: int | None = None) -> list[T]: ...
 
 
 __all__ = [
