@@ -86,6 +86,7 @@ uv run python main.py run --config configs/experiments/default.yaml --run-id <ex
 
 ### Developer Guides
 
-- [How to Add a Language](src/infrastructure/languages/HOW_TO_ADD_A_LANGUAGE.md)
-- [How to Add an Operator](src/coevolution/populations/ADDING_AN_OPERATOR.md)
-- [How to Add a Population](src/coevolution/populations/ADDING_A_POPULATION.md)
+- [How to Add a Language](docs/HOW_TO_ADD_A_LANGUAGE.md)
+- [How to Add an Operator](docs/HOW_TO_ADD_AN_OPERATOR.md)
+- [How to Add a Population](docs/HOW_TO_ADD_A_POPULATION.md)
+- [How to Add an Initializer](docs/HOW_TO_ADD_AN_INITIALIZER.md)
