@@ -12,13 +12,13 @@ from coevolution.core.interfaces import (
     Problem,
 )
 from coevolution.core.interfaces.language import ICodeParser
-from coevolution.strategies.llm_base import ILanguageModel
+from coevolution.strategies.llm_base import BaseLLMInitializer, ILanguageModel
 from coevolution.populations.registries import initializer_registry
-from .base import BaseCodeInitializer
+from ..operators._helpers import _CodeLLMHelpers
 
 
 @initializer_registry.register("direct", population="code")
-class DirectCodeInitializer(BaseCodeInitializer):
+class DirectCodeInitializer(_CodeLLMHelpers, BaseLLMInitializer[CodeIndividual]):
     """Creates Gen-0 code individuals via batched LLM calls (Zero-Shot)."""
 
     def __init__(
@@ -30,7 +30,8 @@ class DirectCodeInitializer(BaseCodeInitializer):
         init_pop_batch_size: int = 2,
         llm_workers: int = 4,
     ) -> None:
-        super().__init__(llm, parser, language_name, pop_config, llm_workers)
+        super().__init__(llm, parser, language_name, pop_config)
+        self.llm_workers = llm_workers
         self.init_pop_batch_size = min(
             init_pop_batch_size, pop_config.initial_population_size or 1
         )

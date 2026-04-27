@@ -7,7 +7,6 @@ from .operators import (
     CodeGenericEditOperator,
 )
 from .initializers import (
-    BaseCodeInitializer,
     DirectCodeInitializer,
 )
 
@@ -16,6 +15,5 @@ __all__ = [
     "CodeMutationOperator",
     "CodeCrossoverOperator",
     "CodeGenericEditOperator",
-    "BaseCodeInitializer",
     "DirectCodeInitializer",
 ]
