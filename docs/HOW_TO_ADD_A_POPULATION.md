@@ -8,17 +8,19 @@ Each population lives in its own subfolder under `src/coevolution/populations/`.
 
 Every population follows this structure:
 
-```
+```text
 populations/<name>/
 ├── __init__.py          # re-exports factory
 ├── profile.py           # factory function: create_<name>_profile(...)
+├── initializers/        # dedicated folder for initializers
+│   ├── __init__.py      # re-exports all initializers
+│   └── standard.py      # <Name>Initializer
 └── operators/
-    ├── __init__.py      # re-exports all operators (to trigger registry)
+    ├── __init__.py      # re-exports all operators
     ├── _helpers.py      # optional: private LLM utility mixin
     ├── mutation.py      # optional: <Name>MutationOperator
     ├── crossover.py     # optional: <Name>CrossoverOperator
-    ├── edit.py          # optional: <Name>EditOperator
-    └── initializer.py  # required: <Name>Initializer
+    └── edit.py          # optional: <Name>EditOperator
 ```
 
 ---
@@ -26,12 +28,15 @@ populations/<name>/
 ## Step-by-Step
 
 ### 1. Create the folder structure
+
 `src/coevolution/populations/<name>/`
 
-### 2. Implement and Register Operators
+### 2. Implement and Register Operators & Initializers
+
 Each operator and initializer should use the central registries for discovery and dependency injection.
 
-#### Operator Example:
+#### Operator Example
+
 ```python
 # populations/<name>/operators/mutation.py
 from coevolution.populations.registries import operator_registry
@@ -41,9 +46,10 @@ class <Name>MutationOperator(BaseLLMOperator[<Individual>]):
     ...
 ```
 
-#### Initializer Example:
+#### Initializer Example
+
 ```python
-# populations/<name>/operators/initializer.py
+# populations/<name>/initializers/standard.py
 from coevolution.populations.registries import initializer_registry
 
 @initializer_registry.register("standard", population="<name>")
@@ -52,6 +58,7 @@ class <Name>Initializer(BaseLLMInitializer[<Individual>]):
 ```
 
 ### 3. Write the profile factory
+
 The factory function is responsible for high-level population configuration and delegating strategy construction to the registries.
 
 ```python
@@ -90,17 +97,20 @@ def create_<name>_profile(llm_client, language_adapter, **factory_config) -> Cod
 ```
 
 ### 4. Wire everything up
-Ensure all operator files are imported in `operators/__init__.py` so their decorators run. Re-export the factory in the main population `__init__.py`.
+
+Ensure all operator files are imported in `operators/__init__.py` and all initializers in `initializers/__init__.py` so their decorators run. Re-export the factory in the main population `__init__.py`.
 
 ### 5. Register in Global Populations
+
 Add `from . import <name>` to `src/coevolution/populations/__init__.py`.
 
 ---
 
 ## Checklist
+
 - [ ] Subfolder created in `src/coevolution/populations/`
 - [ ] Initializer/Operators implement their logic and use `@*_registry.register`
-- [ ] `operators/__init__.py` imports all operator implementations
+- [ ] `initializers/__init__.py` and `operators/__init__.py` import all implementations
 - [ ] `profile.py` uses registries to build `initializer` and `breeder`
 - [ ] `src/coevolution/populations/__init__.py` imports the new package
 - [ ] Config rates (e.g. `standard_init_rate: 1.0`, `mutation_rate: 1.0`) added to experiment YAML.
