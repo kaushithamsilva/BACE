@@ -6,6 +6,7 @@ Population initializer protocol and weighted composite — separated from breedi
 from __future__ import annotations
 
 import math
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Protocol
 
@@ -144,15 +145,27 @@ class WeightedPopulationInitializer[T: BaseIndividual]:
         )
 
         individuals: list[T] = []
-        for ri, slot in zip(self._registered, slots):
-            if slot <= 0:
-                logger.debug(
-                    f"WeightedPopulationInitializer: skipping "
-                    f"{ri.initializer.__class__.__name__} (slot=0)"
-                )
-                continue
-            result = ri.initializer.initialize(problem, size=slot)
-            individuals.extend(result)
+
+        # Use threads for parallel initialisation across sub-initializers
+        # Sub-initializers that use LLMs (like DirectCodeInitializer)
+        # often use their own internal thread pools.
+        with ThreadPoolExecutor() as executor:
+            future_to_ri = {
+                executor.submit(ri.initializer.initialize, problem, size=slot): ri
+                for ri, slot in zip(self._registered, slots)
+                if slot > 0
+            }
+
+            for future in as_completed(future_to_ri):
+                ri = future_to_ri[future]
+                try:
+                    result = future.result()
+                    individuals.extend(result)
+                except Exception as e:
+                    logger.error(
+                        f"WeightedPopulationInitializer: {ri.initializer.__class__.__name__} "
+                        f"failed: {e}"
+                    )
 
         return individuals
 
