@@ -26,7 +26,7 @@ from coevolution.strategies.llm_base import (
 from .edit import AgentCoderEditOperator
 
 
-@initializer_registry.register("agent_coder", population="code")
+@initializer_registry.register("agent_coder", population="agent_coder")
 class AgentCoderInitializer(BaseLLMInitializer[CodeIndividual]):
     """Turn 0 of the AgentCoder loop: generates the first solution and seeds history.
 

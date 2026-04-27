@@ -8,8 +8,8 @@ from loguru import logger
 
 from ..core.interfaces import IExecutionSystem
 from ..core.interfaces.language import ILanguage
-from ..populations import registry
-from ..populations.registry import PopulationRegistry
+from ..populations.registries import profile_registry
+from ..populations.registries.profile import ProfileRegistry
 from infrastructure.llm_client import LLMClient
 from infrastructure.sandbox.types import SandboxConfig
 
@@ -30,7 +30,7 @@ class PopulationDiscoveryService:
         self.execution_system = execution_system
         self.sandbox_config = sandbox_config
         self.cpu_workers = cpu_workers
-        self.registry: PopulationRegistry = registry
+        self.registry: ProfileRegistry = profile_registry
 
     def construct_all(self, experiment_config: Dict[str, Any]) -> Dict[str, Any]:
         """Discover and construct all profiles defined in the config.

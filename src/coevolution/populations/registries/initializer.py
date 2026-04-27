@@ -39,11 +39,14 @@ class InitializerRegistry(DIRegistry[IPopulationInitializer[Any]]):
              # might not support initializers yet.
              return None # type: ignore
 
+        # Combine config and explicit dependencies/overrides
+        full_config = {**dependencies, **config}
+
         # 1. Map registered names to their configured weights
         weights: Dict[str, float] = {}
         for name in registered_classes:
             # Convension: '{name}_init_rate'
-            weight = config.get(f"{name}_init_rate", 0.0)
+            weight = full_config.get(f"{name}_init_rate", 0.0)
             if weight > 0:
                 weights[name] = weight
 
@@ -54,16 +57,15 @@ class InitializerRegistry(DIRegistry[IPopulationInitializer[Any]]):
             weights[first_name] = 1.0
 
         # 2. Instantiate weighted initializers
-        context = {**dependencies, **config}
         registered_inits: List[RegisteredInitializer[Any]] = []
 
         for name, weight in weights.items():
             cls = registered_classes[name]
-            instance = self._instantiate(cls, context)
+            instance = self._instantiate(cls, full_config)
             registered_inits.append(RegisteredInitializer(weight, instance))
 
         # Check for pop_config in dependencies
-        pop_config = dependencies.get("pop_config")
+        pop_config = full_config.get("pop_config")
         if not pop_config:
             raise ValueError("InitializerRegistry requires 'pop_config' in dependencies.")
 

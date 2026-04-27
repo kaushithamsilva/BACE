@@ -48,11 +48,14 @@ class OperatorRegistry(DIRegistry[IOperator[Any]]):
         if not registered_classes:
             raise ValueError(f"No operators registered for population '{population}'")
 
+        # Combine config and explicit dependencies/overrides
+        full_config = {**dependencies, **config}
+
         # 1. Map registered names to their configured weights
         weights: Dict[str, float] = {}
         for name in registered_classes:
             # Note: Operators use '{name}_rate' convention (e.g. mutation_rate)
-            weight = config.get(f"{name}_rate", 0.0)
+            weight = full_config.get(f"{name}_rate", 0.0)
             if weight > 0:
                 weights[name] = weight
 
@@ -69,20 +72,19 @@ class OperatorRegistry(DIRegistry[IOperator[Any]]):
                 )
 
         # 2. Instantiate weighted operators
-        context = {**dependencies, **config}
         registered_ops: List[RegisteredOperator[Any]] = []
         
         for name, weight in weights.items():
             cls = registered_classes[name]
-            instance = self._instantiate(cls, context)
+            instance = self._instantiate(cls, full_config)
             registered_ops.append(RegisteredOperator(weight, instance))
 
         # 3. Create Breeder
-        llm_workers = 1
-        if "llm" in dependencies:
-            llm_workers = getattr(dependencies["llm"], "workers", 1)
+        llm_workers = full_config.get("llm_workers")
+        if llm_workers is None and "llm" in full_config:
+            llm_workers = getattr(full_config["llm"], "workers", 1)
         
-        return Breeder(registered_ops, llm_workers=llm_workers)
+        return Breeder(registered_ops, llm_workers=llm_workers or 1)
 
 
 # Global singleton

@@ -59,12 +59,12 @@ class StandardCodeInitializer(BaseCodeInitializer):
         parser: ICodeParser,
         language_name: str,
         pop_config: PopulationConfig,
-        init_batch_size: int = 2,
+        init_pop_batch_size: int = 2,
         llm_workers: int = 4,
     ) -> None:
         super().__init__(llm, parser, language_name, pop_config, llm_workers)
         self.init_batch_size = min(
-            init_batch_size, pop_config.initial_population_size or 1
+            init_pop_batch_size, pop_config.initial_population_size or 1
         )
 
     def initialize(self, problem: Problem, size: int | None = None) -> list[CodeIndividual]:

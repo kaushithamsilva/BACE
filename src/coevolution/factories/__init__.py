@@ -9,7 +9,7 @@ Adding a new population:
 2. Import the factory function below.
 """
 
-from ..populations import registry
+from ..populations.registries import profile_registry
 from .orchestrator import OrchestratorBuilder, build_orchestrator_from_config
 from .population_discovery import PopulationDiscoveryService
 from .schedule import ScheduleBuilder
@@ -20,7 +20,7 @@ __all__ = [
     "ScheduleBuilder",
     "PopulationDiscoveryService",
     # Registry
-    "registry",
+    "profile_registry",
     # Helper functions
     "build_orchestrator_from_config",
 ]

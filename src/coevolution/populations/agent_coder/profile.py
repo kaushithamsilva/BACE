@@ -77,7 +77,7 @@ def create_agent_coder_code_profile(
 
     initializer: IPopulationInitializer[CodeIndividual] = (
         initializer_registry.build_weighted_initializer(
-            population="code",
+            population="agent_coder",
             config=factory_config,
             llm=llm_client,
             parser=language_adapter.parser,
