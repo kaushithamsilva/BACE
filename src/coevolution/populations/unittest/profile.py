@@ -11,8 +11,10 @@ from coevolution.core.interfaces import (
     PublicTestProfile,
     TestProfile,
 )
-from coevolution.populations.initializer_registry import initializer_registry
-from coevolution.populations.operator_registry import operator_registry
+from coevolution.populations.registries import (
+    initializer_registry,
+    operator_registry,
+)
 from coevolution.core.interfaces.language import ILanguage
 from coevolution.strategies.breeding.breeder import Breeder
 from coevolution.strategies.probability.assigner import ProbabilityAssigner
@@ -22,7 +24,7 @@ from coevolution.strategies.selection.parent_selection import (
 )
 from infrastructure.llm_client import LLMClient
 
-from ..registry import registry
+from ..registries import registry
 # Operators/Initializers imported here to ensure decorators are run
 from .operators.crossover import UnittestCrossoverOperator  # noqa: F401
 from .operators.edit import UnittestEditOperator  # noqa: F401

@@ -11,7 +11,7 @@ from coevolution.core.interfaces import (
     LanguageParsingError,
     LanguageTransformationError,
 )
-from coevolution.populations.operator_registry import operator_registry
+from coevolution.populations.registries import operator_registry
 from coevolution.strategies.llm_base import (
     BaseLLMOperator,
     LLMGenerationError,

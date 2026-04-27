@@ -11,8 +11,10 @@ from coevolution.core.interfaces import (
     PopulationConfig,
     TestProfile,
 )
-from coevolution.populations.initializer_registry import initializer_registry
-from coevolution.populations.operator_registry import operator_registry
+from coevolution.populations.registries import (
+    initializer_registry,
+    operator_registry,
+)
 from coevolution.core.interfaces.language import ILanguage
 from coevolution.strategies.breeding.breeder import Breeder
 from coevolution.strategies.probability.assigner import ProbabilityAssigner
@@ -23,7 +25,7 @@ from coevolution.strategies.selection.parent_selection import (
 from infrastructure.llm_client import LLMClient
 from infrastructure.sandbox import SandboxConfig
 
-from ..registry import registry
+from ..registries import registry
 from .evaluator import PropertyTestEvaluator
 # Operators/Initializers imported here to ensure decorators are run
 from .operators import AdversarialPropertyRefiner, PropertyTestInitializer  # noqa: F401

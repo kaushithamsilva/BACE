@@ -8,7 +8,7 @@ from random import sample
 from typing import Optional, cast
 
 from loguru import logger
-from coevolution.populations.operator_registry import operator_registry
+from coevolution.populations.registries import operator_registry
 
 from coevolution.core.individual import CodeIndividual, TestIndividual
 from coevolution.core.interfaces import CoevolutionContext

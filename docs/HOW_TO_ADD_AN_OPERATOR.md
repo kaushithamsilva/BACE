@@ -20,7 +20,7 @@ It should inherit from `BaseLLMOperator` (for LLM-based operators) or implement 
 from coevolution.strategies.llm_base import BaseLLMOperator, LLMGenerationError, llm_retry
 from coevolution.core.individual import CodeIndividual
 from coevolution.core.interfaces import CoevolutionContext
-from coevolution.populations.operator_registry import operator_registry
+from coevolution.populations.registries import operator_registry
 
 @operator_registry.register("semantic_mutation", population="code")
 class SemanticHeuristicOperator(BaseLLMOperator[CodeIndividual]):
@@ -80,4 +80,4 @@ code_profile:
 - [ ] Total rates in YAML sum to 1.0.
 
 > [!NOTE]
-> You do **not** need to modify the `profile.py` factory function for standard parameters. The registry handles discovery, instantiation, and weighting automatically. If your operator requires a *new* type of dependency not already in the factory, only then should you update the factory to pass it into `build_weighted_breeder`.
+> You do **not** need to modify the `profile.py` factory function for standard parameters. The registry handles discovery, instantiation, and weighting automatically.

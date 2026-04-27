@@ -23,7 +23,7 @@ from infrastructure.sandbox import SandboxConfig, create_sandbox
 
 from ..types import IOPairCache
 from .helpers import transform_public_tests
-from coevolution.populations.initializer_registry import initializer_registry
+from coevolution.populations.registries import initializer_registry
 from .validator import validate_property_test
 
 

@@ -8,7 +8,7 @@ from coevolution.core.interfaces import Problem
 from coevolution.core.individual import TestIndividual
 
 from coevolution.strategies.llm_base import BaseLLMInitializer
-from coevolution.populations.initializer_registry import initializer_registry
+from coevolution.populations.registries import initializer_registry
 
 
 @initializer_registry.register("standard", population="differential")

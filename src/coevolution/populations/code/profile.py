@@ -10,8 +10,10 @@ from coevolution.core.interfaces import (
     IPopulationInitializer,
     PopulationConfig,
 )
-from coevolution.populations.initializer_registry import initializer_registry
-from coevolution.populations.operator_registry import operator_registry
+from coevolution.populations.registries import (
+    initializer_registry,
+    operator_registry,
+)
 from coevolution.core.interfaces.language import ILanguage
 from infrastructure.llm_client import LLMClient
 
@@ -36,7 +38,7 @@ from .operators.initializer import (
 )
 
 
-from ..registry import registry
+from ..registries import registry
 
 
 @registry.code_factory("default")

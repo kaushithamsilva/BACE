@@ -1,7 +1,7 @@
 """No-op operator placeholder for the property test population."""
 
 from __future__ import annotations
-from coevolution.populations.operator_registry import operator_registry
+from coevolution.populations.registries import operator_registry
 
 from typing import TYPE_CHECKING
 

@@ -1,17 +1,18 @@
-"""Central registry for population profile factories.
+"""Registry for population profile factories.
 
 Allows dynamic discovery and construction of populations based on YAML configuration.
 """
 
+from __future__ import annotations
 from typing import Callable, Dict, TypeVar
 
-from ..core.interfaces import CodeProfile, PublicTestProfile, TestProfile
+from coevolution.core.interfaces import CodeProfile, PublicTestProfile, TestProfile
 
 T = TypeVar("T", CodeProfile, TestProfile, PublicTestProfile)
 FactoryFunc = Callable[..., T]
 
 
-class PopulationRegistry:
+class ProfileRegistry:
     """Registry for population profile factories."""
 
     def __init__(self) -> None:
@@ -106,4 +107,5 @@ class PopulationRegistry:
 
 
 # Global registry instance
-registry = PopulationRegistry()
+profile_registry = ProfileRegistry()
+registry = profile_registry

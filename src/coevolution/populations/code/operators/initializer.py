@@ -25,7 +25,7 @@ from coevolution.strategies.llm_base import (
     llm_retry,
 )
 
-from coevolution.populations.initializer_registry import initializer_registry
+from coevolution.populations.registries import initializer_registry
 from ._helpers import _CodeLLMHelpers
 
 

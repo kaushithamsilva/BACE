@@ -10,20 +10,19 @@ The process is "zero-friction" and requires only two steps:
 
 ## 1. Write the implementation
 
-Create your new initializer inside `populations/<name>/operators/<new_initializer>.py`.
+Create your new initializer inside `src/coevolution/populations/<name>/operators/<new_initializer>.py`.
 
 It should inherit from `BaseCodeInitializer` (for code populations) or `BaseLLMInitializer[TestIndividual]` (for test populations).
 
 ```python
-# coevolution/populations/code/operators/zero_shot.py
+# src/coevolution/populations/code/operators/zero_shot.py
 from coevolution.populations.code.operators.initializer import BaseCodeInitializer
-from coevolution.populations.initializer_registry import initializer_registry
+from coevolution.populations.registries import initializer_registry
 
 @initializer_registry.register("zero_shot", population="code")
 class ZeroShotCodeInitializer(BaseCodeInitializer):
     def initialize(self, problem: Problem, size: int | None = None) -> list[CodeIndividual]:
         # Your logic here...
-        # respect the 'size' parameter!
         return []
 ```
 
@@ -38,7 +37,7 @@ The registry uses `inspect` to automatically inject dependencies into your const
 
 ## 2. Export It (1 line)
 
-Make the initializer available so the decorator runs by exporting it in `populations/<name>/operators/__init__.py`:
+Make the initializer available so the decorator runs by exporting it in `src/coevolution/populations/<name>/operators/__init__.py`:
 
 ```python
 from .zero_shot import ZeroShotCodeInitializer
