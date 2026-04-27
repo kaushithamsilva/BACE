@@ -19,9 +19,11 @@ from coevolution.strategies.llm_base import (
     LLMGenerationError,
     llm_retry,
 )
+from coevolution.populations.operator_registry import operator_registry
 from ._helpers import _TestLLMHelpers
 
 
+@operator_registry.register("mutation", population="unittest")
 class UnittestMutationOperator(_TestLLMHelpers, BaseLLMOperator[TestIndividual]):
     """Mutation: select one parent test → LLM rephrase → new TestIndividual."""
 

@@ -11,11 +11,11 @@ from coevolution.core.interfaces import (
     PopulationConfig,
 )
 from coevolution.populations.initializer_registry import initializer_registry
+from coevolution.populations.operator_registry import operator_registry
 from coevolution.core.interfaces.language import ILanguage
 from infrastructure.llm_client import LLMClient
 
 from coevolution.strategies.breeding.breeder import Breeder
-from coevolution.core.interfaces.operators import RegisteredOperator
 from coevolution.strategies.probability.assigner import ProbabilityAssigner
 from coevolution.strategies.selection.elite import (
     CodeDiversityEliteSelector,
@@ -26,10 +26,10 @@ from coevolution.strategies.selection.parent_selection import (
     RouletteWheelParentSelection,
 )
 
-from .operators.mutation import CodeMutationOperator
-from .operators.crossover import CodeCrossoverOperator
-from .operators.edit import CodeGenericEditOperator
-# Initializers imported here to ensure decorators are run
+# Operators/Initializers imported here to ensure decorators are run
+from .operators.mutation import CodeMutationOperator  # noqa: F401
+from .operators.crossover import CodeCrossoverOperator  # noqa: F401
+from .operators.edit import CodeGenericEditOperator  # noqa: F401
 from .operators.initializer import (
     PlanningCodeInitializer,  # noqa: F401
     StandardCodeInitializer,  # noqa: F401
@@ -56,7 +56,7 @@ def create_default_code_profile(
     diversity_enabled: bool = True,
     prob_assigner_strategy: str = "min",
     k_failing_tests: int = 10,
-    **initializer_config: Any,
+    **factory_config: Any,
 ) -> CodeProfile:
     """Create a standard code population profile."""
     # ... (function body)
@@ -85,43 +85,26 @@ def create_default_code_profile(
         strategy=prob_assigner_strategy, initial_prior=initial_prior
     )
 
-    mutation_op = CodeMutationOperator(
-        llm_client,
-        language_adapter.parser,
-        language_adapter.language,
-        parent_selector,
-        prob_assigner,
-    )
-    crossover_op = CodeCrossoverOperator(
-        llm_client,
-        language_adapter.parser,
-        language_adapter.language,
-        parent_selector,
-        prob_assigner,
-    )
-    generic_edit_op = CodeGenericEditOperator(
-        llm_client,
-        language_adapter.parser,
-        language_adapter.language,
-        parent_selector,
-        prob_assigner,
+    breeder: Breeder[CodeIndividual] = operator_registry.build_weighted_breeder(
+        population="code",
+        config=factory_config,
+        llm=llm_client,
+        parser=language_adapter.parser,
+        language_name=language_adapter.language,
+        parent_selector=parent_selector,
+        prob_assigner=prob_assigner,
         failing_test_selector=FailingTestSelector,
         k_failing_tests=k_failing_tests,
-    )
-
-    breeder: Breeder[CodeIndividual] = Breeder(
-        registered_operators=[
-            RegisteredOperator(weight=mutation_rate, operator=mutation_op),
-            RegisteredOperator(weight=crossover_rate, operator=crossover_op),
-            RegisteredOperator(weight=generic_edit_rate, operator=generic_edit_op),
-        ],
-        llm_workers=llm_client.workers,
+        # Pass explicit rates if they are not in factory_config
+        mutation_rate=mutation_rate,
+        crossover_rate=crossover_rate,
+        generic_edit_rate=generic_edit_rate,
     )
 
     initializer: IPopulationInitializer[CodeIndividual] = (
         initializer_registry.build_weighted_initializer(
             population="code",
-            config=initializer_config,
+            config=factory_config,
             llm=llm_client,
             parser=language_adapter.parser,
             language_name=language_adapter.language,

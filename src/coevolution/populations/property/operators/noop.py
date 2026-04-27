@@ -1,6 +1,7 @@
 """No-op operator placeholder for the property test population."""
 
 from __future__ import annotations
+from coevolution.populations.operator_registry import operator_registry
 
 from typing import TYPE_CHECKING
 
@@ -10,6 +11,7 @@ if TYPE_CHECKING:
     from coevolution.core.interfaces.context import CoevolutionContext
 
 
+@operator_registry.register("noop", population="property")
 class NoOpOperator:
     """An operator that produces no offspring.
 

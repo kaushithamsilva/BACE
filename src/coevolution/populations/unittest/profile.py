@@ -12,9 +12,9 @@ from coevolution.core.interfaces import (
     TestProfile,
 )
 from coevolution.populations.initializer_registry import initializer_registry
+from coevolution.populations.operator_registry import operator_registry
 from coevolution.core.interfaces.language import ILanguage
 from coevolution.strategies.breeding.breeder import Breeder
-from coevolution.core.interfaces.operators import RegisteredOperator
 from coevolution.strategies.probability.assigner import ProbabilityAssigner
 from coevolution.strategies.selection.elite import TestDiversityEliteSelector
 from coevolution.strategies.selection.parent_selection import (
@@ -23,11 +23,11 @@ from coevolution.strategies.selection.parent_selection import (
 from infrastructure.llm_client import LLMClient
 
 from ..registry import registry
-from .operators.crossover import UnittestCrossoverOperator
-from .operators.edit import UnittestEditOperator
-# Initializers imported here to ensure decorators are run
+# Operators/Initializers imported here to ensure decorators are run
+from .operators.crossover import UnittestCrossoverOperator  # noqa: F401
+from .operators.edit import UnittestEditOperator  # noqa: F401
 from .operators.initializer import UnittestInitializer  # noqa: F401
-from .operators.mutation import UnittestMutationOperator
+from .operators.mutation import UnittestMutationOperator  # noqa: F401
 
 
 @registry.test_factory("unittest")
@@ -49,7 +49,7 @@ def create_unittest_test_profile(
     learning_rate: float = 0.05,
     prob_assigner_strategy: str = "min",
     diversity_enabled: bool = True,
-    **initializer_config: Any,
+    **factory_config: Any,
 ) -> TestProfile:
     """Create a unittest test population profile."""
     # ... (function body)
@@ -73,41 +73,24 @@ def create_unittest_test_profile(
         strategy=prob_assigner_strategy, initial_prior=initial_prior
     )
 
-    mutation_op = UnittestMutationOperator(
-        llm_client,
-        language_adapter.parser,
-        language_adapter.language,
-        parent_selector,
-        prob_assigner,
-    )
-    crossover_op = UnittestCrossoverOperator(
-        llm_client,
-        language_adapter.parser,
-        language_adapter.language,
-        parent_selector,
-        prob_assigner,
-    )
-    edit_op = UnittestEditOperator(
-        llm_client,
-        language_adapter.parser,
-        language_adapter.language,
-        parent_selector,
-        prob_assigner,
-    )
-
-    breeder: Breeder[TestIndividual] = Breeder(
-        registered_operators=[
-            RegisteredOperator(weight=mutation_rate, operator=mutation_op),
-            RegisteredOperator(weight=crossover_rate, operator=crossover_op),
-            RegisteredOperator(weight=edit_rate, operator=edit_op),
-        ],
-        llm_workers=llm_client.workers,
+    breeder: Breeder[TestIndividual] = operator_registry.build_weighted_breeder(
+        population="unittest",
+        config=factory_config,
+        llm=llm_client,
+        parser=language_adapter.parser,
+        language_name=language_adapter.language,
+        parent_selector=parent_selector,
+        prob_assigner=prob_assigner,
+        # Pass explicit rates if they are not in factory_config
+        mutation_rate=mutation_rate,
+        crossover_rate=crossover_rate,
+        edit_rate=edit_rate,
     )
 
     initializer: IPopulationInitializer[TestIndividual] = (
         initializer_registry.build_weighted_initializer(
             population="unittest",
-            config=initializer_config,
+            config=factory_config,
             llm=llm_client,
             parser=language_adapter.parser,
             language_name=language_adapter.language,

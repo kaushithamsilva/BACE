@@ -11,6 +11,7 @@ from coevolution.core.interfaces import (
     LanguageParsingError,
     LanguageTransformationError,
 )
+from coevolution.populations.operator_registry import operator_registry
 from coevolution.strategies.llm_base import (
     BaseLLMOperator,
     LLMGenerationError,
@@ -20,6 +21,7 @@ from coevolution.strategies.llm_base import (
 from ._helpers import _CodeLLMHelpers
 
 
+@operator_registry.register("crossover", population="code")
 class CodeCrossoverOperator(_CodeLLMHelpers, BaseLLMOperator[CodeIndividual]):
     """Crossover: select two parents → LLM combine → new CodeIndividual."""
 

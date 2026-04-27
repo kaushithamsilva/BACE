@@ -7,13 +7,14 @@ from coevolution.core.individual import TestIndividual
 from coevolution.core.interfaces import (
     BayesianConfig,
     IPopulationInitializer,
+    IParentSelectionStrategy,
     PopulationConfig,
     TestProfile,
 )
 from coevolution.populations.initializer_registry import initializer_registry
+from coevolution.populations.operator_registry import operator_registry
 from coevolution.core.interfaces.language import ILanguage
 from coevolution.strategies.breeding.breeder import Breeder
-from coevolution.core.interfaces.operators import RegisteredOperator
 from coevolution.strategies.probability.assigner import ProbabilityAssigner
 from coevolution.strategies.selection.elite import TestDiversityEliteSelector
 from coevolution.strategies.selection.parent_selection import (
@@ -24,8 +25,9 @@ from infrastructure.sandbox import SandboxConfig
 
 from ..registry import registry
 from .evaluator import PropertyTestEvaluator
+# Operators/Initializers imported here to ensure decorators are run
 from .operators import AdversarialPropertyRefiner, PropertyTestInitializer  # noqa: F401
-from .operators.noop import NoOpOperator
+from .operators.noop import NoOpOperator  # noqa: F401
 from .types import IOPairCache
 
 
@@ -47,7 +49,7 @@ def create_property_test_profile(
     cpu_workers: int = 4,
     enable_multiprocessing: bool = True,
     num_inputs: int = 20,
-    **initializer_config: Any,
+    **factory_config: Any,
 ) -> TestProfile:
     """Create a complete property test population profile."""
     # ... (function body)
@@ -68,7 +70,7 @@ def create_property_test_profile(
     initializer: IPopulationInitializer[TestIndividual] = (
         initializer_registry.build_weighted_initializer(
             population="property",
-            config=initializer_config,
+            config=factory_config,
             llm=llm_client,
             parser=python_parser,
             language_name=language_adapter.language,
@@ -80,21 +82,22 @@ def create_property_test_profile(
 
     # ── Breeder ────────────────────────────────────────────────────────────
     # Enable breeding with the new AdversarialPropertyRefiner
-    breeder: Breeder[TestIndividual] = Breeder(
-        registered_operators=[
-            RegisteredOperator(
-                weight=1.0,
-                operator=AdversarialPropertyRefiner(
-                    llm=llm_client,
-                    parser=python_parser,
-                    language_name=language_adapter.language,
-                    parent_selector=ReverseRouletteWheelParentSelection(),
-                    prob_assigner=ProbabilityAssigner(initial_prior=initial_prior),
-                ),
-            ),
-            RegisteredOperator(weight=0.0, operator=NoOpOperator()),
-        ],
-        llm_workers=llm_client.workers,
+    prob_assigner: ProbabilityAssigner = ProbabilityAssigner(initial_prior=initial_prior)
+    parent_selector: IParentSelectionStrategy[TestIndividual] = (
+        ReverseRouletteWheelParentSelection()
+    )
+
+    breeder: Breeder[TestIndividual] = operator_registry.build_weighted_breeder(
+        population="property",
+        config=factory_config,
+        llm=llm_client,
+        parser=python_parser,
+        language_name=language_adapter.language,
+        parent_selector=parent_selector,
+        prob_assigner=prob_assigner,
+        # Default rates if not in factory_config
+        adversarial_refiner_rate=factory_config.get("adversarial_refiner_rate", 1.0),
+        noop_rate=factory_config.get("noop_rate", 0.0),
     )
 
     # ── Elite selector ───────────────────────────────────────────────────────

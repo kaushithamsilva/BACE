@@ -19,9 +19,11 @@ from coevolution.strategies.llm_base import (
     LLMGenerationError,
     llm_retry,
 )
+from coevolution.populations.operator_registry import operator_registry
 from ._helpers import _TestLLMHelpers
 
 
+@operator_registry.register("crossover", population="unittest")
 class UnittestCrossoverOperator(_TestLLMHelpers, BaseLLMOperator[TestIndividual]):
     """Crossover: combine two parent tests → new TestIndividual."""
 

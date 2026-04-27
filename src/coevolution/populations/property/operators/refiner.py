@@ -7,6 +7,7 @@ import threading
 from typing import TYPE_CHECKING
 
 from loguru import logger
+from coevolution.populations.operator_registry import operator_registry
 
 from coevolution.core.individual import TestIndividual
 from coevolution.core.interfaces import CoevolutionContext, Problem
@@ -27,6 +28,7 @@ if TYPE_CHECKING:
     from coevolution.core.population import TestPopulation
 
 
+@operator_registry.register("adversarial_refiner", population="property")
 class AdversarialPropertyRefiner(BaseLLMOperator[TestIndividual]):
     """Refines property tests using a two-phase CEGIS-like approach.
 

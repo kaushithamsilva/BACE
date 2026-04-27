@@ -11,6 +11,7 @@ from coevolution.core.interfaces import (
     LanguageParsingError,
     LanguageTransformationError,
 )
+from coevolution.populations.operator_registry import operator_registry
 from coevolution.strategies.llm_base import (
     BaseLLMOperator,
     LLMGenerationError,
@@ -21,6 +22,7 @@ from coevolution.strategies.llm_base import (
 from ._helpers import _CodeLLMHelpers
 
 
+@operator_registry.register("mutation", population="code")
 class CodeMutationOperator(_CodeLLMHelpers, BaseLLMOperator[CodeIndividual]):
     """Mutation: select one parent → LLM rephrase → new CodeIndividual."""
 
@@ -73,5 +75,4 @@ class CodeMutationOperator(_CodeLLMHelpers, BaseLLMOperator[CodeIndividual]):
         ]
 
 
-__all__ = ["CodeMutationOperator"]
 __all__ = ["CodeMutationOperator"]

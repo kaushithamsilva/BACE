@@ -5,6 +5,7 @@ from __future__ import annotations
 
 
 from loguru import logger
+from coevolution.populations.operator_registry import operator_registry
 
 from coevolution.core.individual import CodeIndividual
 from coevolution.core.interfaces import (
@@ -30,6 +31,7 @@ from ._helpers import _CodeLLMHelpers
 type TestPopulationType = str
 
 
+@operator_registry.register("generic_edit", population="code")
 class CodeGenericEditOperator(_CodeLLMHelpers, BaseLLMOperator[CodeIndividual]):
     """Self-sufficient operator for feedback-driven mutation (Edit).
 

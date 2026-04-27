@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from loguru import logger
+from coevolution.populations.operator_registry import operator_registry
 
 from coevolution.core.individual import CodeIndividual
 from coevolution.core.interfaces import (
@@ -26,6 +27,7 @@ from coevolution.strategies.llm_base import (
 )
 
 
+@operator_registry.register("edit", population="agent_coder")
 class AgentCoderEditOperator(BaseLLMOperator[CodeIndividual]):
     """Stateful edit operator for the AgentCoder single-agent loop.
 

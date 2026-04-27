@@ -8,6 +8,7 @@ from random import sample
 from typing import Optional, cast
 
 from loguru import logger
+from coevolution.populations.operator_registry import operator_registry
 
 from coevolution.core.individual import CodeIndividual, TestIndividual
 from coevolution.core.interfaces import CoevolutionContext
@@ -43,6 +44,7 @@ class _DiscoveryContext:
     generator_script: str
 
 
+@operator_registry.register("discovery", population="differential")
 class DifferentialDiscoveryOperator(BaseLLMOperator[TestIndividual]):
     """Self-sufficient operator for differential test discovery.
 

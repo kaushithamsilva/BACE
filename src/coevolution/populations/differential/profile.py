@@ -11,9 +11,9 @@ from coevolution.core.interfaces import (
     TestProfile,
 )
 from coevolution.populations.initializer_registry import initializer_registry
+from coevolution.populations.operator_registry import operator_registry
 from coevolution.core.interfaces.language import ILanguage
 from coevolution.strategies.breeding.breeder import Breeder
-from coevolution.core.interfaces.operators import RegisteredOperator
 from coevolution.strategies.probability.assigner import ProbabilityAssigner
 from coevolution.strategies.selection.elite import TestDiversityEliteSelector
 from coevolution.strategies.selection.parent_selection import (
@@ -24,7 +24,8 @@ from infrastructure.sandbox.types import SandboxConfig
 
 from ..registry import registry
 from .finder import DifferentialFinder
-from .operators.discovery import DifferentialDiscoveryOperator
+# Operators/Initializers imported here to ensure decorators are run
+from .operators.discovery import DifferentialDiscoveryOperator  # noqa: F401
 # Initializers imported here to ensure decorators are run
 from .operators.initializer import DifferentialInitializer  # noqa: F401
 from .operators.llm_operator import DifferentialLLMOperator
@@ -52,7 +53,7 @@ def create_differential_test_profile(
     diversity_enabled: bool = True,
     max_pairs_per_group: int = 5,
     num_passing_tests_to_sample: int = 5,
-    **initializer_config: Any,
+    **factory_config: Any,
 ) -> TestProfile:
     """Create a differential test population profile."""
     # Split cpu_workers budget across two parallelism levels so total OS
@@ -97,7 +98,9 @@ def create_differential_test_profile(
         cpu_workers=workers_per_pair,
     )
 
-    discovery_op = DifferentialDiscoveryOperator(
+    breeder: Breeder[TestIndividual] = operator_registry.build_weighted_breeder(
+        population="differential",
+        config=factory_config,
         llm=llm_client,
         parser=language_adapter.parser,
         language_name=language_adapter.language,
@@ -110,19 +113,14 @@ def create_differential_test_profile(
         num_passing_tests_to_sample=num_passing_tests_to_sample,
         llm_workers=llm_client.workers,
         pair_workers=pair_workers,
-    )
-
-    breeder: Breeder[TestIndividual] = Breeder(
-        registered_operators=[
-            RegisteredOperator(weight=discovery_rate, operator=discovery_op)
-        ],
-        llm_workers=1,  # Phase 2 parallelism handled internally by the operator
+        # Default rates if not in factory_config
+        discovery_rate=discovery_rate,
     )
 
     initializer: IPopulationInitializer[TestIndividual] = (
         initializer_registry.build_weighted_initializer(
             population="differential",
-            config=initializer_config,
+            config=factory_config,
             llm=llm_client,
             parser=language_adapter.parser,
             language_name=language_adapter.language,

@@ -11,6 +11,7 @@ from coevolution.core.interfaces import (
     PopulationConfig,
 )
 from coevolution.populations.initializer_registry import initializer_registry
+from coevolution.populations.operator_registry import operator_registry
 from coevolution.core.interfaces.language import ILanguage
 from infrastructure.llm_client import LLMClient
 
@@ -22,8 +23,8 @@ from coevolution.strategies.selection.parent_selection import (
     RouletteWheelParentSelection,
 )
 
-from .operators.edit import AgentCoderEditOperator
-# Initializers imported here to ensure decorators are run
+# Operators/Initializers imported here to ensure decorators are run
+from .operators.edit import AgentCoderEditOperator  # noqa: F401
 from .operators.initializer import AgentCoderInitializer  # noqa: F401
 
 
@@ -37,7 +38,7 @@ def create_agent_coder_code_profile(
     # ... (rest of parameters)
     initial_prior: float = 0.2,
     prob_assigner_strategy: str = "min",
-    **initializer_config: Any,
+    **factory_config: Any,
 ) -> CodeProfile:
     """Create an AgentCoder (iterative repair) code profile."""
     # ... (function body)
@@ -57,7 +58,9 @@ def create_agent_coder_code_profile(
         RouletteWheelParentSelection()
     )
 
-    edit_op = AgentCoderEditOperator(
+    edit_op = operator_registry.build_operator(
+        name="edit",
+        population="agent_coder",
         llm=llm_client,
         parser=language_adapter.parser,
         language_name=language_adapter.language,
@@ -73,7 +76,7 @@ def create_agent_coder_code_profile(
     initializer: IPopulationInitializer[CodeIndividual] = (
         initializer_registry.build_weighted_initializer(
             population="code",
-            config=initializer_config,
+            config=factory_config,
             llm=llm_client,
             parser=language_adapter.parser,
             language_name=language_adapter.language,

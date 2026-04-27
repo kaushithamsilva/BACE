@@ -21,9 +21,11 @@ from coevolution.strategies.llm_base import (
     LLMGenerationError,
     llm_retry,
 )
+from coevolution.populations.operator_registry import operator_registry
 from ._helpers import _TestLLMHelpers
 
 
+@operator_registry.register("edit", population="unittest")
 class UnittestEditOperator(_TestLLMHelpers, BaseLLMOperator[TestIndividual]):
     """Edit: improve a test's discriminating power using passing/failing code context.
 
