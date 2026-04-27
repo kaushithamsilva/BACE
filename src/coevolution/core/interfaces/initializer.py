@@ -28,21 +28,27 @@ class IPopulationInitializer[T: BaseIndividual](Protocol):
     the per-generation breeding loop.
     """
 
+    @property
+    def yields_per_call(self) -> int:
+        """
+        The number of individuals typically produced in a single logical request.
+        For LLM-based code generators, this is usually 1.
+        For unittests or brainstormers, it might be 20 or 50.
+        """
+        return 1
+
     def initialize(self, problem: Problem, size: int | None = None) -> list[T]:
         """
-        Create the initial population for a given problem.
+        Create the initial individuals for a given problem.
 
         Args:
             problem: Problem context (description, starter code, test cases).
-            size: Optional override for how many individuals to produce.
-                  When None, each concrete initializer uses its own
-                  ``pop_config.initial_population_size``.
-                  WeightedPopulationInitializer always passes an explicit
-                  integer to its children.
+            size: The number of individuals to produce in this call.
+                  The worker should aim to fill this quota efficiently
+                  (e.g. using one big LLM request if possible).
 
         Returns:
             List of initial individuals (Generation 0).
-            May return [] for populations that start empty (e.g. differential).
         """
         ...
 
@@ -75,25 +81,13 @@ class WeightedPopulationInitializer[T: BaseIndividual]:
     breeding operators, giving profile factories a uniform, extensible way to
     compose initialisation strategies.
 
-    Slot allocation
-    ---------------
-    Given a total budget *N* and *k* sub-initializers with weights
-    ``w_0 … w_{k-1}``, each sub-initializer receives::
-
-        slot_i = round(N * w_i / sum(weights))
-
-    Integer rounding means the slots might not sum to exactly *N*.  The
-    last slot is adjusted to absorb the rounding remainder so the total is
-    always precise.
-
-    Usage::
-
-        WeightedPopulationInitializer(
-            registered_initializers=[
-                RegisteredInitializer(weight=1.0, initializer=DirectCodeInitializer(...)),
-            ],
-            pop_config=population_config,
-        )
+    Concurrency Orchestration
+    -------------------------
+    This orchestrator centralizes all initialization concurrency. It calculates 
+    the necessary number of parallel workers for each strategy based on its
+    ``yields_per_call`` hint, then schedules them in a single thread pool.
+    This ensures that workers remain simple and stateless, while the 
+    framework handles optimal parallelization of LLM calls.
     """
 
     def __init__(
@@ -115,6 +109,11 @@ class WeightedPopulationInitializer[T: BaseIndividual]:
         self._registered = registered_initializers
         self._pop_config = pop_config
 
+    @property
+    def yields_per_call(self) -> int:
+        """The composite orchestrator fills the entire requested size in one go."""
+        return self._pop_config.initial_population_size
+
     # ------------------------------------------------------------------
     # IPopulationInitializer
     # ------------------------------------------------------------------
@@ -122,22 +121,18 @@ class WeightedPopulationInitializer[T: BaseIndividual]:
     def initialize(self, problem: Problem, size: int | None = None) -> list[T]:
         """
         Distribute the size budget across sub-initializers and concatenate results.
-
-        Args:
-            problem: The problem context forwarded to each sub-initializer.
-            size: Total number of individuals to produce.  When ``None``,
-                  falls back to ``pop_config.initial_population_size``.
-
-        Returns:
-            Concatenated list of individuals in registration order.
         """
-        total = size if size is not None else self._pop_config.initial_population_size
+        if size is None:
+            size = self._pop_config.initial_population_size
 
-        slots = self._compute_slots(total)
+        if size <= 0:
+            return []
+
+        slots = self._compute_slots(size)
 
         logger.debug(
-            f"WeightedPopulationInitializer: total={total}, "
-            f"slot allocation="
+            f"WeightedPopulationInitializer: size={size}, "
+            f"allocation="
             + ", ".join(
                 f"{ri.initializer.__class__.__name__}={s}"
                 for ri, s in zip(self._registered, slots)
@@ -146,26 +141,54 @@ class WeightedPopulationInitializer[T: BaseIndividual]:
 
         individuals: list[T] = []
 
-        # Use threads for parallel initialisation across sub-initializers
-        # Sub-initializers that use LLMs (like DirectCodeInitializer)
-        # often use their own internal thread pools.
-        with ThreadPoolExecutor() as executor:
-            future_to_ri = {
-                executor.submit(ri.initializer.initialize, problem, size=slot): ri
-                for ri, slot in zip(self._registered, slots)
-                if slot > 0
+        # Generate a list of "Parallel Call Tasks"
+        # We determine how many parallel LLM calls are needed to fulfill each slot quota.
+        tasks: list[tuple[IPopulationInitializer[T], int]] = []
+        for ri, slot in zip(self._registered, slots):
+            if slot <= 0:
+                continue
+
+            yields = ri.initializer.yields_per_call
+            num_calls = math.ceil(slot / yields)
+            
+            # Each call will be responsible for a portion of the slot.
+            per_call = math.ceil(slot / num_calls)
+            
+            for i in range(num_calls):
+                # Ensure the last call doesn't overshoot the slot (aesthetic only,
+                # as the worker often returns a fixed batch size anyway)
+                current_quota = min(per_call, slot - (i * per_call))
+                if current_quota > 0:
+                    tasks.append((ri.initializer, current_quota))
+
+        if not tasks:
+            return []
+
+        # Centralized task execution
+        with ThreadPoolExecutor(max_workers=min(len(tasks), 32)) as executor:
+            future_to_task = {
+                executor.submit(init.initialize, problem, size=quota): (init, quota)
+                for init, quota in tasks
             }
 
-            for future in as_completed(future_to_ri):
-                ri = future_to_ri[future]
+            for future in as_completed(future_to_task):
+                init, quota = future_to_task[future]
                 try:
                     result = future.result()
-                    individuals.extend(result)
+                    if result:
+                        # Enforce initial prior and other orchestrator-level defaults
+                        for ind in result:
+                            if ind.probability == 0: # Only set if worker didn't set it
+                                ind.probability = self._pop_config.initial_prior
+                        individuals.extend(result)
                 except Exception as e:
                     logger.error(
-                        f"WeightedPopulationInitializer: {ri.initializer.__class__.__name__} "
-                        f"failed: {e}"
+                        f"WeightedPopulationInitializer: {init.__class__.__name__} task failed: {e}"
                     )
+
+        # Truncate if over-generated (common with batch-yield workers)
+        if len(individuals) > size:
+            individuals = individuals[:size]
 
         return individuals
 

@@ -23,7 +23,6 @@ from coevolution.core.interfaces import (
     BaseIndividual,
     CoevolutionContext,
     IPopulationInitializer,
-    PopulationConfig,
     Problem,
 )
 from coevolution.core.interfaces.language import ICodeParser
@@ -170,10 +169,8 @@ class BaseLLMInitializer[T: BaseIndividual](
         llm: ILanguageModel,
         parser: ICodeParser,
         language_name: str,
-        pop_config: PopulationConfig,
     ) -> None:
         super().__init__(llm, parser, language_name)
-        self.pop_config = pop_config
 
     @abstractmethod
     def initialize(self, problem: Problem, size: int | None = None) -> list[T]: ...

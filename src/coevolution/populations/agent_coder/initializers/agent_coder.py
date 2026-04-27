@@ -6,7 +6,6 @@ from __future__ import annotations
 from coevolution.core.individual import CodeIndividual
 from coevolution.core.interfaces import (
     OPERATION_INITIAL,
-    PopulationConfig,
     Problem,
 )
 from coevolution.populations.registries import initializer_registry
@@ -39,15 +38,14 @@ class AgentCoderInitializer(BaseLLMInitializer[CodeIndividual]):
         llm: ILanguageModel,
         parser: ICodeParser,
         language_name: str,
-        pop_config: PopulationConfig,
         edit_operator: AgentCoderEditOperator,
     ) -> None:
-        super().__init__(llm, parser, language_name, pop_config)
-        if pop_config.initial_population_size != 1:
-            raise ValueError("AgentCoder only supports initial_population_size=1")
+        super().__init__(llm, parser, language_name)
         self._edit_operator = edit_operator
 
     def initialize(self, problem: Problem, size: int | None = None) -> list[CodeIndividual]:
+        if size is not None and size != 1:
+             raise ValueError("AgentCoder initializer only supports size=1 per session.")
         self._edit_operator.reset_session()
         return [self._generate_initial(problem)]
 
@@ -89,7 +87,7 @@ class AgentCoderInitializer(BaseLLMInitializer[CodeIndividual]):
 
         return CodeIndividual(
             snippet=code,
-            probability=self.pop_config.initial_prior,
+            probability=0.0,  # Set by orchestrator
             creation_op=OPERATION_INITIAL,
             generation_born=0,
             explanation=self.parser.get_docstring(code),

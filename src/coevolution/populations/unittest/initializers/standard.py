@@ -2,12 +2,9 @@
 
 from __future__ import annotations
 
-from loguru import logger
-
 from coevolution.core.individual import TestIndividual
 from coevolution.core.interfaces import (
     OPERATION_INITIAL,
-    PopulationConfig,
     Problem,
 )
 from coevolution.populations.registries import initializer_registry
@@ -40,29 +37,32 @@ class UnittestInitializer(_TestLLMHelpers, BaseLLMInitializer[TestIndividual]):
         llm: ILanguageModel,
         parser: ICodeParser,
         language_name: str,
-        pop_config: PopulationConfig,
-        llm_workers: int = 1,
+        yields_per_call: int = 20,
     ) -> None:
-        super().__init__(llm, parser, language_name, pop_config)
-        self.llm_workers = llm_workers
+        super().__init__(llm, parser, language_name)
+        self._yields_per_call = yields_per_call
+
+    @property
+    def yields_per_call(self) -> int:
+        return self._yields_per_call
 
     def initialize(self, problem: Problem, size: int | None = None) -> list[TestIndividual]:
-        target = size if size is not None else self.pop_config.initial_population_size
-        test_functions = self._generate_test_functions(problem, target)
+        if size is None:
+            size = self._yields_per_call
+        test_functions = self._generate_test_functions(problem, size)
 
         individuals: list[TestIndividual] = []
         for fn in test_functions:
             individuals.append(
                 TestIndividual(
                     snippet=fn,
-                    probability=self.pop_config.initial_prior,
+                    probability=0.0,  # Set by orchestrator
                     creation_op=OPERATION_INITIAL,
                     generation_born=0,
                     explanation=self.parser.get_docstring(fn),
                     metadata={"initializer": self.__class__.__name__},
                 )
             )
-        logger.debug(f"UnittestInitializer: created {len(individuals)} individuals")
         return individuals
 
     @llm_retry(
@@ -93,10 +93,9 @@ class UnittestInitializer(_TestLLMHelpers, BaseLLMInitializer[TestIndividual]):
         if len(test_functions) > target:
             test_functions = test_functions[:target]
 
-        # Top-up under-generation with an additional LLM call
+        # Top-up under-generation with an additional LLM call if necessary
         if len(test_functions) < target:
             additional = target - len(test_functions)
-            logger.info(f"UnittestInitializer: topping up {additional} more tests")
             extra_prompt = self.prompt_manager.render_prompt(
                 "operators/unittest/initial.j2",
                 population_size=additional,

@@ -9,7 +9,7 @@ from dataclasses import replace
 from loguru import logger
 
 from coevolution.core.individual import TestIndividual
-from coevolution.core.interfaces import OPERATION_INITIAL, PopulationConfig, Problem
+from coevolution.core.interfaces import OPERATION_INITIAL, Problem
 from coevolution.core.interfaces.language import ICodeParser
 from coevolution.strategies.llm_base import (
     BaseLLMInitializer,
@@ -46,34 +46,35 @@ class PropertyTestInitializer(BaseLLMInitializer[TestIndividual]):
         llm: ILanguageModel,
         parser: ICodeParser,
         language_name: str,
-        pop_config: PopulationConfig,
         sandbox_config: SandboxConfig,
         io_pair_cache: IOPairCache,
+        yields_per_call: int = 10,
         llm_workers: int = 8,
     ) -> None:
-        super().__init__(llm, parser, language_name, pop_config)
+        super().__init__(llm, parser, language_name)
         self.sandbox_config = sandbox_config
         self.io_pair_cache = io_pair_cache
-        self.llm_workers = llm_workers
+        self._yields_per_call = yields_per_call
+        self._llm_workers = llm_workers
         self._python_lang = PythonLanguage()
         self._python_sandbox_config = replace(sandbox_config, language="python")
+
+    @property
+    def yields_per_call(self) -> int:
+        return self._yields_per_call
+
+    @property
+    def llm_workers(self) -> int:
+        return self._llm_workers
 
     # ── IPopulationInitializer ────────────────────────────────────────────────
 
     def initialize(self, problem: Problem, size: int | None = None) -> list[TestIndividual]:
-        # LLM call 1: generate and cache the input-generator script
+        # Generate and cache the shared input-generator script for this problem.
         self._generate_and_cache_generator(problem)
 
-        # LLM call 2: generate and prune property test snippets
+        # Generate a batch of property tests (brainstorm descriptions + implementation).
         individuals = self._generate_property_tests(problem)
-
-        # Cap to requested size (property initializer generates as many valid tests as it
-        # can; the caller may request a specific number via the weighted registry)
-        if size is not None and len(individuals) > size:
-            logger.debug(
-                f"PropertyTestInitializer: capping {len(individuals)} individuals to {size}"
-            )
-            individuals = individuals[:size]
 
         return individuals
 
@@ -157,7 +158,7 @@ class PropertyTestInitializer(BaseLLMInitializer[TestIndividual]):
             individuals.append(
                 TestIndividual(
                     snippet=snippet,
-                    probability=self.pop_config.initial_prior,
+                    probability=0.0,  # Set by orchestrator
                     creation_op=OPERATION_INITIAL,
                     generation_born=0,
                     explanation=self.parser.get_docstring(snippet),
