@@ -760,6 +760,7 @@ class Orchestrator:
                 operation=getattr(ind, "creation_op", "INITIAL"),
                 probability=ind.probability,
                 parents=getattr(ind, "parents", None),
+                initializer_name=ind.metadata.get("initializer"),
             )
 
         code_population = CodePopulation(code_individuals, generation=0)
@@ -790,6 +791,7 @@ class Orchestrator:
                 probability=ind.probability,
                 parents=getattr(ind, "parents", None),
                 test_type=test_type,
+                initializer_name=ind.metadata.get("initializer"),
             )
 
         test_population = TestPopulation(

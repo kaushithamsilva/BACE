@@ -50,7 +50,7 @@ from .data import (
 )
 
 # 8. Initializer (depends on base, data)
-from .initializer import IPopulationInitializer
+from .initializer import IPopulationInitializer, RegisteredInitializer, WeightedPopulationInitializer
 
 # 10. Language and Sandbox Adapters (depends on data)
 from .language import (
@@ -131,6 +131,8 @@ __all__ = [
     "IProbabilityAssigner",
     # Initializer
     "IPopulationInitializer",
+    "RegisteredInitializer",
+    "WeightedPopulationInitializer",
     # Selection
     "IEliteSelectionStrategy",
     "IParentSelectionStrategy",

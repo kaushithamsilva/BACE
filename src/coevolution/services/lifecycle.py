@@ -45,16 +45,24 @@ class LifecycleEmitter:
         probability: float,
         parents: dict[str, list[str]] | None = None,
         test_type: str | None = None,
+        initializer_name: str | None = None,
     ) -> None:
         """
         Log the birth of a new individual. Includes the raw `snippet`!
         Also automatically logs `BECAME_PARENT` for all recorded parents.
+
+        Args:
+            initializer_name: Class name of the concrete initializer that created
+                              this individual (e.g. 'StandardCodeInitializer').
+                              Only set for Gen-0 individuals; None for bred offspring.
         """
         parents_dict = parents if parents is not None else {"code": [], "test": []}
 
         msg = f"CREATED {individual_id} (op: {operation})"
         if test_type:
             msg += f" for {test_type}"
+        if initializer_name:
+            msg += f" via {initializer_name}"
 
         LifecycleEmitter._emit(
             generation=generation,
@@ -66,6 +74,7 @@ class LifecycleEmitter:
             probability=probability,
             parents=parents_dict,
             test_type=test_type,
+            initializer_name=initializer_name,
         )
 
         for p_type, p_ids in parents_dict.items():

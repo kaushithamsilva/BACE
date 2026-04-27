@@ -21,4 +21,6 @@ init_pop_batch_size: 2
 # Selection strategy
 diversity_enabled: true
 prob_assigner_strategy: "min"
-planning_enabled: true
+# Initializer rates (must have at least one > 0)
+standard_init_rate: 0.0
+planning_init_rate: 1.0

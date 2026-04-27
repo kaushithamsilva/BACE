@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from coevolution.core.individual import TestIndividual
-from coevolution.core.interfaces import BayesianConfig, PopulationConfig, TestProfile
+from coevolution.core.interfaces import BayesianConfig, PopulationConfig, RegisteredInitializer, TestProfile, WeightedPopulationInitializer
 from coevolution.core.interfaces.language import ILanguage
 from coevolution.strategies.breeding.breeder import Breeder
 from coevolution.core.interfaces.operators import RegisteredOperator
@@ -110,11 +110,21 @@ def create_differential_test_profile(
         llm_workers=1,  # Phase 2 parallelism handled internally by the operator
     )
 
-    initializer = DifferentialInitializer(
-        llm=llm_client,
-        parser=language_adapter.parser,
-        language_name=language_adapter.language,
-        pop_config=population_config,
+    initializer: WeightedPopulationInitializer[TestIndividual] = (
+        WeightedPopulationInitializer(
+            registered_initializers=[
+                RegisteredInitializer(
+                    weight=1.0,
+                    initializer=DifferentialInitializer(
+                        llm=llm_client,
+                        parser=language_adapter.parser,
+                        language_name=language_adapter.language,
+                        pop_config=population_config,
+                    ),
+                )
+            ],
+            pop_config=population_config,
+        )
     )
 
     elite_selector: TestDiversityEliteSelector[TestIndividual] = (

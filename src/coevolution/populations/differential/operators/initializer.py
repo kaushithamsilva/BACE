@@ -13,7 +13,7 @@ from coevolution.strategies.llm_base import BaseLLMInitializer
 class DifferentialInitializer(BaseLLMInitializer[TestIndividual]):
     """Differential tests start empty — Gen 0 is always []."""
 
-    def initialize(self, problem: Problem) -> list[TestIndividual]:
+    def initialize(self, problem: Problem, size: int | None = None) -> list[TestIndividual]:
         logger.debug("DifferentialInitializer: starting with empty population")
         return []
 

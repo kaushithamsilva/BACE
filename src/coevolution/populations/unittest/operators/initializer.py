@@ -44,8 +44,8 @@ class UnittestInitializer(_TestLLMHelpers, BaseLLMInitializer[TestIndividual]):
         super().__init__(llm, parser, language_name, pop_config)
         self.llm_workers = llm_workers
 
-    def initialize(self, problem: Problem) -> list[TestIndividual]:
-        target = self.pop_config.initial_population_size
+    def initialize(self, problem: Problem, size: int | None = None) -> list[TestIndividual]:
+        target = size if size is not None else self.pop_config.initial_population_size
         test_functions = self._generate_test_functions(problem, target)
 
         individuals: list[TestIndividual] = []
@@ -57,6 +57,7 @@ class UnittestInitializer(_TestLLMHelpers, BaseLLMInitializer[TestIndividual]):
                     creation_op=OPERATION_INITIAL,
                     generation_born=0,
                     explanation=self.parser.get_docstring(fn),
+                    metadata={"initializer": self.__class__.__name__},
                 )
             )
         logger.debug(f"UnittestInitializer: created {len(individuals)} individuals")

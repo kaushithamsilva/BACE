@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from coevolution.core.individual import TestIndividual
-from coevolution.core.interfaces import BayesianConfig, PopulationConfig, TestProfile
+from coevolution.core.interfaces import BayesianConfig, PopulationConfig, RegisteredInitializer, TestProfile, WeightedPopulationInitializer
 from coevolution.core.interfaces.language import ILanguage
 from coevolution.strategies.breeding.breeder import Breeder
 from coevolution.core.interfaces.operators import RegisteredOperator
@@ -57,14 +57,24 @@ def create_property_test_profile(
     io_pair_cache = IOPairCache()
 
     # ── Initializer ──────────────────────────────────────────────────────────
-    initializer = PropertyTestInitializer(
-        llm=llm_client,
-        parser=python_parser,
-        language_name=language_adapter.language,
-        pop_config=pop_config,
-        sandbox_config=sandbox_config,
-        io_pair_cache=io_pair_cache,
-        llm_workers=llm_client.workers,
+    initializer: WeightedPopulationInitializer[TestIndividual] = (
+        WeightedPopulationInitializer(
+            registered_initializers=[
+                RegisteredInitializer(
+                    weight=1.0,
+                    initializer=PropertyTestInitializer(
+                        llm=llm_client,
+                        parser=python_parser,
+                        language_name=language_adapter.language,
+                        pop_config=pop_config,
+                        sandbox_config=sandbox_config,
+                        io_pair_cache=io_pair_cache,
+                        llm_workers=llm_client.workers,
+                    ),
+                )
+            ],
+            pop_config=pop_config,
+        )
     )
 
     # ── Breeder ────────────────────────────────────────────────────────────

@@ -7,7 +7,9 @@ from coevolution.core.interfaces import (
     BayesianConfig,
     PopulationConfig,
     PublicTestProfile,
+    RegisteredInitializer,
     TestProfile,
+    WeightedPopulationInitializer,
 )
 from coevolution.core.interfaces.language import ILanguage
 from coevolution.strategies.breeding.breeder import Breeder
@@ -99,12 +101,22 @@ def create_unittest_test_profile(
         llm_workers=llm_client.workers,
     )
 
-    initializer = UnittestInitializer(
-        llm=llm_client,
-        parser=language_adapter.parser,
-        language_name=language_adapter.language,
-        pop_config=population_config,
-        llm_workers=llm_client.workers,
+    initializer: WeightedPopulationInitializer[TestIndividual] = (
+        WeightedPopulationInitializer(
+            registered_initializers=[
+                RegisteredInitializer(
+                    weight=1.0,
+                    initializer=UnittestInitializer(
+                        llm=llm_client,
+                        parser=language_adapter.parser,
+                        language_name=language_adapter.language,
+                        pop_config=population_config,
+                        llm_workers=llm_client.workers,
+                    ),
+                )
+            ],
+            pop_config=population_config,
+        )
     )
 
     elite_selector: TestDiversityEliteSelector[TestIndividual] = (

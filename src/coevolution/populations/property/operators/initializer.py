@@ -58,12 +58,22 @@ class PropertyTestInitializer(BaseLLMInitializer[TestIndividual]):
 
     # ── IPopulationInitializer ────────────────────────────────────────────────
 
-    def initialize(self, problem: Problem) -> list[TestIndividual]:
+    def initialize(self, problem: Problem, size: int | None = None) -> list[TestIndividual]:
         # LLM call 1: generate and cache the input-generator script
         self._generate_and_cache_generator(problem)
 
         # LLM call 2: generate and prune property test snippets
-        return self._generate_property_tests(problem)
+        individuals = self._generate_property_tests(problem)
+
+        # Cap to requested size (property initializer generates as many valid tests as it
+        # can; the caller may request a specific number via the weighted registry)
+        if size is not None and len(individuals) > size:
+            logger.debug(
+                f"PropertyTestInitializer: capping {len(individuals)} individuals to {size}"
+            )
+            individuals = individuals[:size]
+
+        return individuals
 
     # ── LLM call 1 ───────────────────────────────────────────────────────────
 
@@ -152,6 +162,7 @@ class PropertyTestInitializer(BaseLLMInitializer[TestIndividual]):
                     metadata={
                         "pruning": "passed_public_io",
                         "description": description,
+                        "initializer": self.__class__.__name__,
                     },
                 )
             )

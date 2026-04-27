@@ -43,7 +43,7 @@ class BaseCodeInitializer(_CodeLLMHelpers, BaseLLMInitializer[CodeIndividual], A
         self.llm_workers = llm_workers
 
     @abstractmethod
-    def initialize(self, problem: Problem) -> list[CodeIndividual]:
+    def initialize(self, problem: Problem, size: int | None = None) -> list[CodeIndividual]:
         """Create Gen-0 code individuals."""
         ...
 
@@ -65,10 +65,13 @@ class StandardCodeInitializer(BaseCodeInitializer):
             init_batch_size, pop_config.initial_population_size or 1
         )
 
-    def initialize(self, problem: Problem) -> list[CodeIndividual]:
-        target = self.pop_config.initial_population_size
+    def initialize(self, problem: Problem, size: int | None = None) -> list[CodeIndividual]:
+        target = size if size is not None else self.pop_config.initial_population_size
+        # Clamp batch size to target in case the caller requested fewer individuals
+        # than the default batch size configured at construction time.
+        effective_batch = min(self.init_batch_size, target) if target > 0 else 1
         individuals: list[CodeIndividual] = []
-        num_batches = (target + self.init_batch_size - 1) // self.init_batch_size
+        num_batches = (target + effective_batch - 1) // effective_batch if target > 0 else 0
 
         def _generate_batch(batch_size: int) -> list[str]:
             if batch_size == 1:
@@ -106,7 +109,7 @@ class StandardCodeInitializer(BaseCodeInitializer):
         )
         with ThreadPoolExecutor(max_workers=self.llm_workers) as executor:
             futures = [
-                executor.submit(_generate_batch, self.init_batch_size)
+                executor.submit(_generate_batch, effective_batch)
                 for _ in range(num_batches)
             ]
             for future in as_completed(futures):
@@ -120,6 +123,7 @@ class StandardCodeInitializer(BaseCodeInitializer):
                                 creation_op=OPERATION_INITIAL,
                                 generation_born=0,
                                 explanation=self.parser.get_docstring(snip),
+                                metadata={"initializer": self.__class__.__name__},
                             )
                         )
                 except Exception as e:
@@ -135,8 +139,8 @@ class StandardCodeInitializer(BaseCodeInitializer):
 class PlanningCodeInitializer(BaseCodeInitializer):
     """Two-phase: plan per individual, then code from plan."""
 
-    def initialize(self, problem: Problem) -> list[CodeIndividual]:
-        target = self.pop_config.initial_population_size
+    def initialize(self, problem: Problem, size: int | None = None) -> list[CodeIndividual]:
+        target = size if size is not None else self.pop_config.initial_population_size
 
         @llm_retry(
             (
@@ -203,7 +207,7 @@ class PlanningCodeInitializer(BaseCodeInitializer):
                             creation_op=OPERATION_INITIAL,
                             generation_born=0,
                             explanation=plan,
-                            metadata={"plan": plan},
+                            metadata={"plan": plan, "initializer": self.__class__.__name__},
                         )
                     )
                 except Exception as e:
