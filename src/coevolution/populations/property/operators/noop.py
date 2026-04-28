@@ -6,13 +6,14 @@ from coevolution.populations.registries import operator_registry
 from typing import TYPE_CHECKING
 
 from coevolution.core.individual import TestIndividual
+from coevolution.core.interfaces.operators import IOperator
 
 if TYPE_CHECKING:
     from coevolution.core.interfaces.context import CoevolutionContext
 
 
 @operator_registry.register("noop", population="property")
-class NoOpOperator:
+class NoOpOperator(IOperator[TestIndividual]):
     """An operator that produces no offspring.
 
     Used as a placeholder while breeding is disabled for the property test
@@ -22,6 +23,10 @@ class NoOpOperator:
 
     def execute(self, context: "CoevolutionContext") -> list[TestIndividual]:
         return []
+
+    def reset(self, scope: str = "") -> None:
+        """Does nothing."""
+        pass
 
     def operation_name(self) -> str:
         return "noop"

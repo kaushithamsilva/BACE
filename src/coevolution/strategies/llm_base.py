@@ -153,6 +153,10 @@ class BaseLLMOperator[T: BaseIndividual](BaseLLMService, IOperator[T], ABC):
     @abstractmethod
     def execute(self, context: CoevolutionContext) -> list[T]: ...
 
+    def reset(self, scope: str = "problem") -> None:
+        """Default no-op reset for LLM operators."""
+        pass
+
 
 class BaseLLMInitializer[T: BaseIndividual](
     BaseLLMService, IPopulationInitializer[T], ABC

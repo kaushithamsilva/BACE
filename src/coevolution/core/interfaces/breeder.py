@@ -13,6 +13,7 @@ from .base import BaseIndividual
 
 if TYPE_CHECKING:
     from .context import CoevolutionContext
+    from .operators import RegisteredOperator
 
 
 class IBreeder[T: BaseIndividual](Protocol):
@@ -23,6 +24,15 @@ class IBreeder[T: BaseIndividual](Protocol):
     per population. The concrete Breeder handles operator sampling, retries,
     and parallel execution internally.
     """
+
+    @property
+    def operators(self) -> list["RegisteredOperator[T]"]:
+        """Returns the list of registered operators."""
+        ...
+
+    def add_operators(self, new_operators: list["RegisteredOperator[T]"]) -> None:
+        """Dynamically add new operators to the breeder's pool."""
+        ...
 
     def breed(self, context: "CoevolutionContext", num_offsprings: int) -> list[T]:
         """

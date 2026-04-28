@@ -139,8 +139,8 @@ class Orchestrator:
 
         # Reset Test Operators
         for profile in self.evolved_test_profiles.values():
-            for reg_op in profile.breeder.operators:
-                reg_op.operator.reset(scope)
+            for test_reg_op in profile.breeder.operators:
+                test_reg_op.operator.reset(scope)
 
     def run(self, problem: Problem) -> tuple[CodePopulation, dict[str, TestPopulation]]:
         """
