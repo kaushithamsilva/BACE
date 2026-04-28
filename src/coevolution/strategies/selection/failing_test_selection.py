@@ -1,5 +1,6 @@
-import numpy as np
 from loguru import logger
+import numpy as np
+
 
 from coevolution.core.individual import CodeIndividual, TestIndividual
 from coevolution.core.interfaces import CoevolutionContext
@@ -79,10 +80,15 @@ class FailingTestSelector:
                     candidates.append((test_ind, test_type))
 
         if not candidates:
+            logger.trace(f"FailingTestSelector: No failing candidates for code {code_individual.id}")
             return []
 
         # Limit to available tests if fewer than k exist
         num_to_select = min(k, len(candidates))
+        logger.trace(
+            f"FailingTestSelector: Found {len(candidates)} failing candidates "
+            f"for code {code_individual.id}. Selecting up to {k}."
+        )
 
         # Extract probabilities from the TestIndividual objects
         probabilities = [ind.probability for ind, _ in candidates]
@@ -102,5 +108,11 @@ class FailingTestSelector:
             # Remove selected item to prevent duplicates
             remaining_candidates.pop(selected_idx)
             remaining_probabilities.pop(selected_idx)
+
+        logger.debug(
+            f"FailingTestSelector: Selected {len(selected_tests)}/{len(candidates)} "
+            f"failing tests for code {code_individual.id}. "
+            f"Types: {list(set(t[1] for t in selected_tests))}"
+        )
 
         return selected_tests
