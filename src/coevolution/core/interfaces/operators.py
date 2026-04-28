@@ -48,5 +48,13 @@ class IOperator[T: BaseIndividual](Protocol):
         """The name of the operation this instance handles (e.g. 'mutation')."""
         ...
 
+    def reset(self, scope: str = "problem") -> None:
+        """
+        Optional: Resets the operator's internal state.
+        Common scopes: 'problem', 'generation'.
+        Default implementation does nothing (stateless).
+        """
+        pass
+
 
 __all__ = ["IOperator", "RegisteredOperator"]

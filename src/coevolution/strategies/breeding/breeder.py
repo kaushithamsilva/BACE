@@ -59,6 +59,11 @@ class Breeder[T: BaseIndividual]:
         self._op_weights = [ro.weight for ro in registered_operators]
         self._op_list = [ro.operator for ro in registered_operators]
 
+    @property
+    def operators(self) -> list[RegisteredOperator[T]]:
+        """Returns the list of registered operators."""
+        return self._operators
+
     def add_operators(self, new_operators: list[RegisteredOperator[T]]) -> None:
         """
         Dynamically add new operators to the breeder's pool.
@@ -110,6 +115,12 @@ class Breeder[T: BaseIndividual]:
                     if results:
                         offspring.extend(results)
                         consecutive_failures = 0
+                        needed = num_offsprings - len(offspring)
+                        if needed > 0:
+                            logger.info(
+                                f"Breeder: Generated {len(results)} offspring. "
+                                f"Continuing to reach target {num_offsprings} ({needed} more needed)."
+                            )
                     else:
                         consecutive_failures += 1
                 except Exception as e:
@@ -158,6 +169,12 @@ class Breeder[T: BaseIndividual]:
 
                 if batch_produced:
                     consecutive_failures = 0
+                    needed = num_offsprings - len(offspring)
+                    if needed > 0:
+                        logger.info(
+                            f"Breeder: Batch produced offspring. "
+                            f"Continuing to reach target {num_offsprings} ({needed} more needed)."
+                        )
                 else:
                     consecutive_failures += batch_size
 

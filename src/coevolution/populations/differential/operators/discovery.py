@@ -5,7 +5,7 @@ from __future__ import annotations
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from random import sample
-from typing import Optional, cast
+from typing import Any, Optional, cast
 
 from loguru import logger
 from coevolution.populations.registries import operator_registry
@@ -82,6 +82,24 @@ class DifferentialDiscoveryOperator(BaseLLMOperator[TestIndividual]):
         self.llm_workers = llm_workers
         self.pair_workers = pair_workers
         self._explored_pairs_cache: set[tuple[str, str]] = set()
+        self._broken_groups_this_gen: set[tuple[str, ...]] = set()
+
+    def reset(self, scope: str = "problem") -> None:
+        """Reset the operator state based on scope."""
+        if scope == "problem":
+            self._explored_pairs_cache.clear()
+            self._broken_groups_this_gen.clear()
+            logger.info(f"{self.__class__.__name__}: Full state reset (problem scope)")
+        elif scope == "generation":
+            # Clear generation-scoped throttling but keep explored pairs
+            self._broken_groups_this_gen.clear()
+            logger.debug(f"{self.__class__.__name__}: Generation cache reset")
+
+    def _get_group_key(self, group: Any) -> tuple[str, ...]:
+        """Returns a stable, hashable identifier for a functional group."""
+        if isinstance(group, FunctionallyEquivGroup):
+            return tuple(sorted(ind.id for ind in group.code_individuals))
+        return tuple()
 
     def operation_name(self) -> str:
         return OPERATION_DISCOVERY
@@ -114,6 +132,16 @@ class DifferentialDiscoveryOperator(BaseLLMOperator[TestIndividual]):
         # Phase 3: run divergence finding
         offspring = self._batch_find_divergences(context, discovery_ctxs)
         logger.info(f"Phase 3: produced {len(offspring)} test individuals")
+
+        # Mark groups as broken if we found divergences
+        for ind in offspring:
+            group = ind.metadata.get("group")
+            if group:
+                group_key = self._get_group_key(group)
+                if group_key not in self._broken_groups_this_gen:
+                    logger.info(f"Group {group_key} successfully split! Throttling it for this generation.")
+                self._broken_groups_this_gen.add(group_key)
+
         return offspring
 
     # ------------------------------------------------------------------
@@ -126,6 +154,11 @@ class DifferentialDiscoveryOperator(BaseLLMOperator[TestIndividual]):
 
         candidates_by_group: list[list[_DiscoveryTask]] = []
         for group in groups:
+            group_key = self._get_group_key(group)
+            if group_key in self._broken_groups_this_gen:
+                logger.info(f"Group {group_key} already split this generation, skipping.")
+                continue
+
             inds = group.code_individuals
             if len(inds) < 2:
                 continue
@@ -138,6 +171,8 @@ class DifferentialDiscoveryOperator(BaseLLMOperator[TestIndividual]):
                 for j in range(i + 1, len(sorted_inds))
                 if not self._is_pair_explored(sorted_inds[i], sorted_inds[j])
             ]
+            if len(group_pairs) < (len(sorted_inds) * (len(sorted_inds) - 1)) // 2:
+                logger.debug(f"Skipped some pairs in group {group_key} because they were already explored.")
             if group_pairs:
                 group_pairs.sort(
                     key=lambda t: t.code_a.probability + t.code_b.probability,
@@ -343,7 +378,7 @@ class DifferentialDiscoveryOperator(BaseLLMOperator[TestIndividual]):
                         generation_born=context.code_population.generation + 1,
                         parents={"code": [winner.id, loser.id], "test": []},
                         explanation=self.parser.get_docstring(snippet),
-                        metadata={"io_pair": io_pair},
+                        metadata={"io_pair": io_pair, "group": task.group},
                     )
                 )
 

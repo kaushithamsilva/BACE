@@ -131,6 +131,17 @@ class Orchestrator:
         self.ledger_factory = ledger_factory
         self.composer = composer
 
+    def _reset_all_operators(self, scope: str) -> None:
+        """Resets all operators in all populations for a given scope."""
+        # Reset Code Operators
+        for reg_op in self.code_profile.breeder.operators:
+            reg_op.operator.reset(scope)
+
+        # Reset Test Operators
+        for profile in self.evolved_test_profiles.values():
+            for reg_op in profile.breeder.operators:
+                reg_op.operator.reset(scope)
+
     def run(self, problem: Problem) -> tuple[CodePopulation, dict[str, TestPopulation]]:
         """
         Runs the main co-evolutionary loop with multiple test populations:
@@ -237,6 +248,8 @@ class Orchestrator:
         Returns:
             Tuple of (code_pop, evolved_test_pops_dict, public_pop, private_pop)
         """
+        # --- Reset all operators for the new problem ---
+        self._reset_all_operators(scope="problem")
 
         # Create Code Population
         code_pop = self._create_initial_code_population(problem)
@@ -589,6 +602,9 @@ class Orchestrator:
                     Populations are mutated in-place.
         """
         code_pop = context.code_population
+
+        # --- 0. Reset operators for the current generation ---
+        self._reset_all_operators(scope="generation")
 
         # --- 1. Breed Code (If Active) ---
         new_code_inds = None
