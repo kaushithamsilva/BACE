@@ -19,7 +19,7 @@ def test_groq_llm_live_generation() -> None:
     """
     # Check for required environment variables
     if "GROQ_API_KEY" not in os.environ:
-        pytest.fail("Missing required environment variable for live test: GROQ_API_KEY")
+        pytest.skip("Missing required environment variable for live test: GROQ_API_KEY")
 
     config_path = Path("configs/llm/groq-gpt-oss-120b.yaml")
     assert config_path.exists(), f"Config file not found: {config_path}"

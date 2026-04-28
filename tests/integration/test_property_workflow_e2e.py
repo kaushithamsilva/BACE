@@ -179,6 +179,8 @@ def property_profile(
         max_population_size=10,
         num_inputs=5,
         enable_multiprocessing=False,  # simpler for integration tests
+        op_rates={"noop": 1.0},
+        init_rates={"standard": 1.0},
     )
 
 
@@ -200,6 +202,8 @@ def add_profile(llm_client: LLMClient, sandbox_config: SandboxConfig) -> TestPro
         max_population_size=10,
         num_inputs=5,
         enable_multiprocessing=False,
+        op_rates={"noop": 1.0},
+        init_rates={"standard": 1.0},
     )
 
 
@@ -694,6 +698,8 @@ class TestFullPipelineE2E:
             max_population_size=5,
             num_inputs=3,
             enable_multiprocessing=False,
+            op_rates={"noop": 1.0},
+            init_rates={"standard": 1.0},
         )
 
         # Step 1 — initialization (LLM call)

@@ -12,10 +12,11 @@ import pytest
 from coevolution.core.individual import CodeIndividual, TestIndividual
 from coevolution.core.interfaces import (
     OPERATION_CROSSOVER,
-    OPERATION_EDIT,
     OPERATION_INITIAL,
     OPERATION_MUTATION,
+    OPERATION_REPAIR,
     OPERATION_REPRODUCTION,
+    ParentDict,
 )
 
 
@@ -127,7 +128,7 @@ class TestBaseIndividualSharedBehavior:
             OPERATION_INITIAL,
             OPERATION_MUTATION,
             OPERATION_CROSSOVER,
-            OPERATION_EDIT,
+            OPERATION_REPAIR,
             OPERATION_REPRODUCTION,
         ]
 
@@ -243,7 +244,7 @@ class TestCodeIndividual:
         operations: list[str] = [
             OPERATION_INITIAL,
             OPERATION_MUTATION,
-            OPERATION_EDIT,
+            OPERATION_REPAIR,
             OPERATION_REPRODUCTION,
         ]
 
@@ -478,7 +479,7 @@ class TestIndividualEdgeCases:
 
     def test_many_parent_ids(self) -> None:
         """Test individual with many parent IDs (unusual but valid)."""
-        many_parents = {"code": [f"C{i}" for i in range(100)], "test": []}
+        many_parents: ParentDict = {"code": [f"C{i}" for i in range(100)], "test": []}
         individual = CodeIndividual(
             snippet="def test(): pass",
             probability=0.5,

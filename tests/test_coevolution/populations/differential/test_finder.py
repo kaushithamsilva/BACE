@@ -307,7 +307,7 @@ class TestFindDifferential:
 
         call_counter: list[int] = [0]
 
-        def patched_run(code: str, input_data: dict[str, Any]) -> _SnippetResult:
+        def patched_run(code: str, input_data: dict[str, Any], *args: Any, **kwargs: Any) -> _SnippetResult:
             i = call_counter[0]
             call_counter[0] += 1
             # First call (code_a for input 0): simulate a sandbox error

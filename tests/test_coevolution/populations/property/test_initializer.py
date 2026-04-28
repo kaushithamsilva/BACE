@@ -21,7 +21,7 @@ from unittest.mock import MagicMock, patch
 from coevolution.core.individual import TestIndividual
 from coevolution.core.interfaces import OPERATION_INITIAL, PopulationConfig
 from coevolution.core.interfaces.data import BasicExecutionResult, Problem, Test
-from coevolution.populations.property.operators.initializer import (
+from coevolution.populations.property.initializers.standard import (
     PropertyTestInitializer,
 )
 from coevolution.populations.property.types import IOPairCache
@@ -127,7 +127,6 @@ def make_initializer(
         llm=mock_llm,
         parser=python.parser,
         language_name="python",
-        pop_config=POP_CONFIG,
         sandbox_config=SANDBOX_CONFIG,
         io_pair_cache=cache,
     )
@@ -135,7 +134,7 @@ def make_initializer(
 
 
 # patch target — create_sandbox is imported into the initializer module
-_PATCH = "coevolution.populations.property.operators.initializer.create_sandbox"
+_PATCH = "coevolution.populations.property.initializers.standard.create_sandbox"
 
 
 # ── Happy-path tests ───────────────────────────────────────────────────────────
@@ -182,7 +181,7 @@ class TestHappyPath:
         with patch(_PATCH, return_value=InProcessSandbox()):
             individuals = init.initialize(SORT_PROBLEM)
 
-        assert individuals[0].probability == POP_CONFIG.initial_prior
+        assert individuals[0].probability == 0.0
 
     def test_individual_creation_op_is_initial(self) -> None:
         init, _, mock_llm = make_initializer()

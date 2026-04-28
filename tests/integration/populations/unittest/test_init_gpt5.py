@@ -1,25 +1,27 @@
-
 import os
 import sys
+from typing import List
+
 from loguru import logger
-from typing import List, Optional
 
 # Add src to path if necessary
 sys.path.append(os.path.abspath("src"))
 
+import pytest
+
 from coevolution.core.individual import TestIndividual
 from coevolution.core.interfaces import PopulationConfig, Problem, Test
-from coevolution.populations.unittest.operators.initializer import UnittestInitializer
+from coevolution.populations.unittest.initializers.standard import UnittestInitializer
 from infrastructure.languages.python.adapter import PythonLanguage
-from infrastructure.llm_client.factory import create_llm_client
-import pytest
 from infrastructure.llm_client.base import LLMClient
+from infrastructure.llm_client.factory import create_llm_client
+
 
 @pytest.mark.integration
-def test_unittest_initialization_gpt5() -> Optional[int]:
+def test_unittest_initialization_gpt5() -> None:
     """
     Integration test for UnittestInitializer using GPT-5-mini.
-    
+
     This test verifies that the initializer can correctly generate and
     populate a unittest population of size 20.
     """
@@ -27,9 +29,7 @@ def test_unittest_initialization_gpt5() -> Optional[int]:
     # Note: Ensure OPENAI_API_KEY is set in your environment
     try:
         llm: LLMClient = create_llm_client(
-            provider="openai",
-            model="gpt-5-mini",
-            reasoning_effort="minimal"
+            provider="openai", model="gpt-5-mini", reasoning_effort="minimal"
         )
     except Exception as e:
         logger.error(f"Failed to create LLM client: {e}")
@@ -37,7 +37,7 @@ def test_unittest_initialization_gpt5() -> Optional[int]:
 
     # 2. Setup Language
     lang: PythonLanguage = PythonLanguage()
-    
+
     # 3. Setup Config
     # Target 20 as requested by the user to reproduce the bug
     pop_config: PopulationConfig = PopulationConfig(
@@ -45,7 +45,7 @@ def test_unittest_initialization_gpt5() -> Optional[int]:
         initial_population_size=20,
         max_population_size=20,
     )
-    
+
     # 4. Setup Problem (Two Sum)
     problem: Problem = Problem(
         question_title="Two Sum",
@@ -57,26 +57,31 @@ def test_unittest_initialization_gpt5() -> Optional[int]:
             Test(input="nums = [3,2,4], target = 6", output="[1,2]"),
             Test(input="nums = [3,3], target = 6", output="[0,1]"),
         ],
-        private_test_cases=[]
+        private_test_cases=[],
     )
-    
+
     # 5. Initialize
     initializer: UnittestInitializer = UnittestInitializer(
         llm=llm,
         parser=lang.parser,
         language_name="python",
-        pop_config=pop_config
+        yields_per_call=pop_config.initial_population_size,
     )
-    
+
     logger.info("Starting Unittest initialization with GPT-5-mini...")
     individuals: List[TestIndividual] = initializer.initialize(problem)
-    
+
     logger.info(f"Created {len(individuals)} individuals")
     for i, ind in enumerate(individuals):
-        logger.info(f"Individual {i+1} snippet:\n{ind.snippet}")
-    
-    assert len(individuals) == 20, f"FAILURE: Created only {len(individuals)} individuals (expected 20)."
+        logger.info(f"Individual {i + 1} snippet:\n{ind.snippet}")
+
+    assert len(individuals) == 20, (
+        f"FAILURE: Created only {len(individuals)} individuals (expected 20)."
+    )
     logger.success("SUCCESS: Created all 20 individuals.")
+
+    return None
+
 
 if __name__ == "__main__":
     test_unittest_initialization_gpt5()

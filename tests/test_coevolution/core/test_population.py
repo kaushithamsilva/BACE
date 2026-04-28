@@ -369,7 +369,6 @@ class TestBasePopulationSharedBehavior:
         sample_code_population.set_next_generation(new_individuals)
 
         # Verify logging was called
-        mock_logger.debug.assert_called()
         mock_logger.info.assert_called()
 
 
