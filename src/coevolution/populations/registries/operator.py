@@ -7,6 +7,8 @@ enabling dynamic discovery and instantiation from YAML configuration.
 from __future__ import annotations
 from typing import Any, Dict, List
 
+from loguru import logger
+
 from coevolution.core.interfaces.operators import IOperator, RegisteredOperator
 from coevolution.strategies.breeding.breeder import Breeder
 from .base import DIRegistry
@@ -72,6 +74,7 @@ class OperatorRegistry(DIRegistry[IOperator[Any]]):
         self,
         population: str,
         config: Dict[str, Any],
+        injected_operators: Dict[str, IOperator[Any]] | None = None,
         **dependencies: Any,
     ) -> Breeder[Any]:
         """Build a Breeder with weighted operators from YAML config.
@@ -79,6 +82,7 @@ class OperatorRegistry(DIRegistry[IOperator[Any]]):
         Args:
             population: The population type (e.g. 'code').
             config: Dict of YAML configuration keys (must contain 'op_rates').
+            injected_operators: Map of name -> instantiated operator to use instead of registry lookup.
             dependencies: Common dependencies (llm, parser, parent_selector, etc.)
 
         Returns:
@@ -94,9 +98,16 @@ class OperatorRegistry(DIRegistry[IOperator[Any]]):
         registered_classes = self.get_all(population)
         registered_ops: List[RegisteredOperator[Any]] = []
         
+        injected_operators = injected_operators or {}
+
         for name, weight in weights.items():
-            cls = registered_classes[name]
-            instance = self._instantiate(cls, full_config)
+            if name in injected_operators:
+                instance = injected_operators[name]
+                logger.debug(f"Using injected operator instance for '{name}'")
+            else:
+                cls = registered_classes[name]
+                instance = self._instantiate(cls, full_config)
+            
             registered_ops.append(RegisteredOperator(weight, instance))
 
         # 4. Create Breeder

@@ -47,18 +47,7 @@ class PopulationDiscoveryService:
             "public_test_profile": None,
         }
 
-        # 1. Code Profile
-        code_cfg = experiment_config.get("code_profile")
-        if code_cfg:
-            # Determine profile type (e.g., "default", "agent_coder")
-            # For now, default to "default" unless specified
-            code_type = experiment_config.get("code_profile_type", "default")
-            results["code_profile"] = self._construct_profile(
-                self.registry.get_code_factory(code_type), code_cfg
-            )
-            logger.info(f"Constructed code profile of type '{code_type}'")
-
-        # 2. Public Profile
+        # 1. Public Profile
         public_cfg = experiment_config.get("public_profile")
         if public_cfg:
             results["public_test_profile"] = self._construct_profile(
@@ -66,21 +55,45 @@ class PopulationDiscoveryService:
             )
             logger.info("Constructed public test profile")
 
-        # 3. Evolved Test Populations
+        # 2. Evolved Test Populations
         # We iterate through all registered test populations and see if they are in the config
+        injected_repair_ops: dict[str, Any] = {}
+
         for test_type in self.registry.registered_test_populations:
             profile_key = f"{test_type}_profile"
             test_cfg = experiment_config.get(profile_key)
             if test_cfg:
                 factory = self.registry.get_test_factory(test_type)
-                results["evolved_test_profiles"][test_type] = self._construct_profile(
-                    factory, test_cfg
-                )
+                profile = self._construct_profile(factory, test_cfg)
+                results["evolved_test_profiles"][test_type] = profile
+                
+                # Collect repair operators "brought in" by this test population
+                for reg_op in profile.repair_operators:
+                    name = reg_op.operator.operation_name()
+                    injected_repair_ops[name] = reg_op.operator
+                    logger.debug(f"Collected injected repair operator '{name}' from '{test_type}' profile")
+                
                 logger.info(f"Constructed evolved test profile for '{test_type}'")
+
+        # 3. Code Profile
+        code_cfg = experiment_config.get("code_profile")
+        if code_cfg:
+            # Determine profile type (e.g., "default", "agent_coder")
+            code_type = experiment_config.get("code_profile_type", "default")
+            
+            # Pass injected operators to the code factory
+            results["code_profile"] = self._construct_profile(
+                self.registry.get_code_factory(code_type), 
+                code_cfg,
+                injected_operators=injected_repair_ops
+            )
+            logger.info(f"Constructed code profile of type '{code_type}'")
 
         return results
 
-    def _construct_profile(self, factory: Any, config: Dict[str, Any]) -> Any:
+    def _construct_profile(
+        self, factory: Any, config: Dict[str, Any], **extra_deps: Any
+    ) -> Any:
         """Call a factory function with arguments from config + common dependencies."""
         sig = inspect.signature(factory)
         kwargs = {}
@@ -92,6 +105,7 @@ class PopulationDiscoveryService:
             "execution_system": self.execution_system,
             "sandbox_config": self.sandbox_config,
             "cpu_workers": self.cpu_workers,
+            **extra_deps,
         }
 
         has_kwargs = any(p.kind == inspect.Parameter.VAR_KEYWORD for p in sig.parameters.values())

@@ -45,6 +45,7 @@ def create_default_code_profile(
     elitism_rate: float = 0.2,
     diversity_enabled: bool = True,
     prob_assigner_strategy: str = "min",
+    injected_operators: dict[str, Any] | None = None,
     **factory_config: Any,
 ) -> CodeProfile:
     """Create a standard code population profile."""
@@ -69,6 +70,7 @@ def create_default_code_profile(
     breeder: Breeder[CodeIndividual] = operator_registry.build_weighted_breeder(
         population="code",
         config=factory_config,
+        injected_operators=injected_operators,
         llm=llm_client,
         parser=language_adapter.parser,
         language_name=language_adapter.language,

@@ -14,9 +14,12 @@ code_profile:
   max_population_size: 5
   offspring_rate: 0.3
   elitism_rate: 0.3
-  mutation_rate: 0.2
-  crossover_rate: 0.2
-  edit_rate: 0.6
+  op_rates:
+    mutation: 0.2
+    crossover: 0.2
+    generic_repair: 0.6
+  init_rates:
+    direct: 1.0
   k_failing_tests: 5
   init_pop_batch_size: 1
   diversity_enabled: false
