@@ -3,6 +3,7 @@
 This guide explains how to add a new evolutionary operator (e.g., a new heuristic mutation, a novel crossover technique) to a population using the **Operator Registry**.
 
 The process is "zero-friction" and requires only three steps:
+
 1. Implement the class and tag with `@operator_registry.register`.
 2. Export it in the package `__init__.py`.
 3. Assign the weight in your YAML configuration.
@@ -34,13 +35,38 @@ class SemanticHeuristicOperator(BaseLLMOperator[CodeIndividual]):
 ```
 
 ### Dependency Injection
-The registry uses `inspect` to automatically inject dependencies into your constructor (`__init__`). You can request:
-- `llm`: The language model client.
-- `parser`: The code parser for the current language.
+
+The registry uses `inspect` to automatically inject dependencies into your constructor (`__init__`). For any operator inheriting from `BaseLLMOperator`, the following dependencies are **mandatory** and must be provided in the constructor:
+
+- `llm`: The language model client (`ILanguageModel`).
+- `parser`: The code parser for the current language (`ICodeParser`).
 - `language_name`: The string name of the language (e.g., "python").
-- `parent_selector`: The strategy used to select parents.
-- `prob_assigner`: The strategy used to assign probabilities to offspring.
-- Any other parameter passed to `build_weighted_breeder` in the profile factory.
+- `parent_selector`: The strategy used to select parents (`IParentSelectionStrategy`).
+- `prob_assigner`: The strategy used to assign probabilities to offspring (`IProbabilityAssigner`).
+
+Example constructor for a custom repair operator:
+
+```python
+def __init__(
+    self,
+    llm: ILanguageModel,
+    parser: ICodeParser,
+    language_name: str,
+    parent_selector: IParentSelectionStrategy[Any],
+    prob_assigner: IProbabilityAssigner,
+    # Add custom parameters here (will be pulled from YAML)
+    k_failing_tests: int = 10,
+    **kwargs: Any,
+) -> None:
+    super().__init__(
+        llm=llm,
+        parser=parser,
+        language_name=language_name,
+        parent_selector=parent_selector,
+        prob_assigner=prob_assigner,
+    )
+    self.k_failing_tests = k_failing_tests
+```
 
 ## 2. Export It (1 line)
 
@@ -68,12 +94,22 @@ code_profile:
   generic_edit_rate: 0.4
 ```
 
-> [!IMPORTANT]
-> The sum of all `*_rate` values for a population must equal exactly **1.0**.
+
+### 4. Specialized Repair Operators (`*_repair`)
+
+A unique feature of BACE is the **Specialized Repair** system. While most operators are "owned" by the population they evolve (e.g., a "mutation" operator for the `code` population), the `code` population often needs repair logic that is tightly coupled to the *test* population currently being co-evolved.
+
+For example:
+- **`unittest` population**: Uses `UnittestCodeRepairOperator` (registered as `code_repair` for `population="code"`).
+- **`property` population**: Uses `PropertyCodeRepairOperator` (registered as `code_repair` for `population="code"`).
+- **`public` population**: Uses `PublicCodeRepairOperator` (registered as `code_repair` for `population="code"`).
+
+When the `PopulationDiscoveryService` builds the `code` population, it automatically searches for a `code_repair` operator. If your module exports a specialized version, the registry will prioritize it, allowing each environment to provide its own domain-specific repair strategy for the same target individuals.
 
 ---
 
 ## Summary Checklist
+
 - [ ] Operator class implemented and decorated with `@operator_registry.register`.
 - [ ] Class imported in `operators/__init__.py`.
 - [ ] Rate assigned in `.yaml` config (e.g., `semantic_mutation_rate: 0.2`).

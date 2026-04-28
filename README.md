@@ -41,6 +41,15 @@ uv run python main.py list-configs llm
 Configuration files live under `configs/` and are modular (LLM, profiles, sandbox, schedules, experiments).
 See [configs/README.md](configs/README.md) for details and examples on composing configs and overriding values.
 
+### Operator Registry & Architecture
+
+BACE uses a **centralized Operator Registry** to manage the evolutionary operator lifecycle. Instead of manual instantiation in profile factories, operators are:
+1. **Registered**: Tagged with `@operator_registry.register(name, population)`.
+2. **Discovered**: Automatically found by the `OperatorRegistry` during system initialization.
+3. **Injected**: Constructed with mandatory dependencies (`llm`, `parser`, `parent_selector`, etc.) via constructor-based dependency injection.
+
+This architecture ensures high type safety and allows for "zero-friction" addition of new genetic operators. For more details, see [HOW_TO_ADD_AN_OPERATOR.md](docs/HOW_TO_ADD_AN_OPERATOR.md).
+
 ## Project Structure (high level)
 
 - **Source:** `src/` — core modules and implementations.
