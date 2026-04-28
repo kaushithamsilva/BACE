@@ -22,7 +22,7 @@ class PropertyCodeRepairOperator(CodeGenericRepairOperator):
         llm: ILanguageModel,
         parser: ICodeParser,
         language_name: str,
-        parent_selector: IParentSelectionStrategy,
+        parent_selector: IParentSelectionStrategy[Any],
         prob_assigner: IProbabilityAssigner,
         failing_test_selector: type[FailingTestSelector] = FailingTestSelector,
         k_failing_tests: int = 10,

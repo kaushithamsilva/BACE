@@ -104,13 +104,6 @@ class OperatorRegistry(DIRegistry[IOperator[Any]]):
             if name in injected_operators:
                 instance = injected_operators[name]
                 logger.debug(f"Using injected operator instance for '{name}'")
-                
-                # Late binding: If the injected operator supports strategy binding, inject dependencies now
-                if hasattr(instance, "bind_strategies"):
-                    instance.bind_strategies(
-                        parent_selector=dependencies.get("parent_selector"),
-                        prob_assigner=dependencies.get("prob_assigner"),
-                    )
             else:
                 cls = registered_classes[name]
                 instance = self._instantiate(cls, full_config)

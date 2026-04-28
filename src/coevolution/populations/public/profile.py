@@ -4,12 +4,9 @@ from __future__ import annotations
 from typing import Any
 
 from coevolution.core.interfaces import BayesianConfig, PublicTestProfile
-from coevolution.populations.registries import profile_registry, operator_registry
+from coevolution.populations.registries import profile_registry
 from coevolution.core.interfaces.language import ILanguage
 from coevolution.strategies.llm_base import ILanguageModel
-from coevolution.core.interfaces.operators import RegisteredOperator
-
-from .operators.code_repair import PublicCodeRepairOperator
 
 
 @profile_registry.public_factory("public")
@@ -24,21 +21,6 @@ def create_public_test_profile(
 ) -> PublicTestProfile:
     """Create a public/ground-truth test profile (fixed tests, no evolution)."""
     
-    # Instantiate the specialized repair operator
-    # Note: public profile doesn't have its own breeder/selector, so we use common ones
-    public_code_repair = RegisteredOperator(
-        weight=0.0,
-        operator=operator_registry._instantiate(
-            PublicCodeRepairOperator,
-            {
-                "llm": llm_client,
-                "parser": language_adapter.parser,
-                "language_name": language_adapter.language,
-                **factory_config,
-            },
-        ),
-    )
-
     return PublicTestProfile(
         bayesian_config=BayesianConfig(
             alpha=alpha,
@@ -46,7 +28,6 @@ def create_public_test_profile(
             gamma=gamma,
             learning_rate=learning_rate,
         ),
-        repair_operators=(public_code_repair,),
     )
 
 

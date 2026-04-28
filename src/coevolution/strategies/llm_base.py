@@ -140,19 +140,10 @@ class BaseLLMOperator[T: BaseIndividual](BaseLLMService, IOperator[T], ABC):
         llm: ILanguageModel,
         parser: ICodeParser,
         language_name: str,
-        parent_selector: IParentSelectionStrategy[T] | None = None,
-        prob_assigner: IProbabilityAssigner | None = None,
-    ) -> None:
-        super().__init__(llm, parser, language_name)
-        self.parent_selector = parent_selector
-        self.prob_assigner = prob_assigner
-
-    def bind_strategies(
-        self,
         parent_selector: IParentSelectionStrategy[T],
         prob_assigner: IProbabilityAssigner,
     ) -> None:
-        """Late-binding of evolutionary strategies."""
+        super().__init__(llm, parser, language_name)
         self.parent_selector = parent_selector
         self.prob_assigner = prob_assigner
 
