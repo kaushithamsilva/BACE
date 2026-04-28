@@ -10,7 +10,7 @@ The coevolution framework implements a co-evolutionary algorithm where code and 
 
 ## Module Structure
 
-```
+```text
 src/coevolution/core/
 ├── individual.py          # Concrete individual implementations
 ├── population.py          # Concrete population implementations
@@ -235,7 +235,7 @@ type ParentDict = dict[Literal["code", "test"], list[str]]
 # Standard operations (not exhaustive)
 OPERATION_INITIAL = "initial"      # Generation 0
 OPERATION_CROSSOVER = "crossover"  # Two-parent combination
-OPERATION_EDIT = "edit"            # Feedback-driven improvement
+OPERATION_REPAIR = "repair"          # Feedback-driven improvement
 OPERATION_REPRODUCTION = "reproduction"  # Elite preservation
 OPERATION_MUTATION = "mutation"    # Single-parent variation
 
@@ -354,7 +354,7 @@ OperatorRatesConfig(
     operation_rates={
         "mutation": 0.4,   # 40% single-parent variation
         "crossover": 0.3,  # 30% two-parent combination
-        "edit": 0.3,       # 30% feedback-driven improvement
+        "generic_repair": 0.3, # 30% feedback-driven improvement
     }
 )
 ```
@@ -747,7 +747,7 @@ Configuration for fixed/ground-truth test populations.
 
 Based on the orchestrator implementation, here is the complete algorithm:
 
-```
+```text
 ALGORITHM: Co-Evolutionary Code and Test Generation
 
 INPUT:
@@ -1067,44 +1067,44 @@ END PROCEDURE
 
 ### Key Algorithmic Features
 
-**1. Phased Evolution Schedule**
+#### 1. Phased Evolution Schedule
 
 - Different phases can have different evolution rules
 - Example: Phase 1 (test-first), Phase 2 (code-first), Phase 3 (co-evolution)
 - Controlled by `phase.evolve_code` and `phase.evolve_tests` flags
 
-**2. Bias Prevention in Belief Updates**
+#### 2. Bias Prevention in Belief Updates
 
 - **Problem**: Tests and code can mutually reinforce incorrect beliefs
 - **Solution**: Anchor code with ground-truth public tests first
 - **Order**: Public → Code → Tests → Code (with tests)
 - Prevents runaway confirmation bias
 
-**3. Interaction Ledger**
+#### 3. Interaction Ledger
 
 - Tracks which code-test pairs have been evaluated
 - Prevents double-counting the same evidence
 - Supports incremental updates (only new individuals get new evidence)
 
-**4. Multiple Test Population Types**
+#### 4. Multiple Test Population Types
 
 - Fixed populations: "public" (anchoring), "private" (evaluation)
 - Evolved populations: "unittest", "differential", "property", etc.
 - Each evolved type has independent configuration and strategies
 
-**5. Elite Preservation + Offspring Generation**
+#### 5. Elite Preservation + Offspring Generation
 
 - Elites: Best individuals preserved unchanged (no reproduction operation)
 - Offspring: Generated via genetic operations (mutation, crossover, edit, etc.)
 - Population size = len(elites) + len(offspring)
 
-**6. Lifecycle Tracking**
+#### 6. Lifecycle Tracking
 
 - Every individual logs all lifecycle events
 - Complete provenance: parents, operations, probability updates
 - Enables post-hoc analysis and debugging
 
-**7. Empty Population Support**
+#### 7. Empty Population Support
 
 - Populations can start with size=0 (bootstrapping)
 - Example: Differential tests start empty, grow as divergent code pairs emerge
@@ -1136,7 +1136,7 @@ For each phase in schedule:
    - Transition to next generation
 4. **Log**: Generation summary
 
-### Finalization
+### Finalization Results
 
 1. Final execution on all tests
 2. Final private test evaluation

@@ -27,7 +27,7 @@ from infrastructure.llm_client import LLMClient
 from ..registries import profile_registry
 # Operators/Initializers imported here to ensure decorators are run
 from .operators.crossover import UnittestCrossoverOperator  # noqa: F401
-from .operators.edit import UnittestEditOperator  # noqa: F401
+from .operators.repair import UnittestRepairOperator  # noqa: F401
 from .initializers import UnittestInitializer  # noqa: F401
 from .operators.mutation import UnittestMutationOperator  # noqa: F401
 
@@ -41,10 +41,7 @@ def create_unittest_test_profile(
     initial_population_size: int = 20,
     max_population_size: int = 20,
     elitism_rate: float = 0.4,
-    mutation_rate: float = 0.2,
     offspring_rate: float = 0.8,
-    crossover_rate: float = 0.3,
-    edit_rate: float = 0.5,
     alpha: float = 0.01,
     beta: float = 0.3,
     gamma: float = 0.3,
@@ -55,9 +52,7 @@ def create_unittest_test_profile(
 ) -> TestProfile:
     """Create a unittest test population profile."""
     # ... (function body)
-    total_rate = mutation_rate + crossover_rate + edit_rate
-    if not (0.99 <= total_rate <= 1.01):
-        raise ValueError(f"Operation rates must sum to 1.0, got {total_rate:.4f}")
+    # Configuration delegated to registries
 
     population_config = PopulationConfig(
         initial_prior=initial_prior,
@@ -83,10 +78,6 @@ def create_unittest_test_profile(
         language_name=language_adapter.language,
         parent_selector=parent_selector,
         prob_assigner=prob_assigner,
-        # Pass explicit rates if they are not in factory_config
-        mutation_rate=mutation_rate,
-        crossover_rate=crossover_rate,
-        edit_rate=edit_rate,
     )
 
     initializer: IPopulationInitializer[TestIndividual] = (

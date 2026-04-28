@@ -1,4 +1,4 @@
-"""AgentCoderEditOperator — stateful single-agent loop edit operator."""
+"""AgentCoderRepairOperator — stateful single-agent loop repair operator."""
 
 from __future__ import annotations
 
@@ -7,7 +7,6 @@ from coevolution.populations.registries import operator_registry
 
 from coevolution.core.individual import CodeIndividual
 from coevolution.core.interfaces import (
-    OPERATION_EDIT,
     CoevolutionContext,
 )
 from coevolution.core.interfaces.language import (
@@ -27,9 +26,9 @@ from coevolution.strategies.llm_base import (
 )
 
 
-@operator_registry.register("edit", population="agent_coder")
-class AgentCoderEditOperator(BaseLLMOperator[CodeIndividual]):
-    """Stateful edit operator for the AgentCoder single-agent loop.
+@operator_registry.register("repair", population="agent_coder")
+class AgentCoderRepairOperator(BaseLLMOperator[CodeIndividual]):
+    """Stateful repair operator for the AgentCoder single-agent loop.
 
     Maintains conversation history across calls within one problem.
     Call reset_session() between problems.
@@ -48,11 +47,11 @@ class AgentCoderEditOperator(BaseLLMOperator[CodeIndividual]):
 
     def reset_session(self) -> None:
         """Wipe conversation memory. Call between problems."""
-        logger.info("AgentCoderEditOperator: session reset")
+        logger.info("AgentCoderRepairOperator: session reset")
         self._conversation_history.clear()
 
     def operation_name(self) -> str:
-        return OPERATION_EDIT
+        return "repair"
 
     @llm_retry(
         (
@@ -69,7 +68,7 @@ class AgentCoderEditOperator(BaseLLMOperator[CodeIndividual]):
 
         if len(code_pop) != 1:
             raise ValueError(
-                f"AgentCoderEditOperator requires exactly 1 individual, got {len(code_pop)}"
+                f"AgentCoderRepairOperator requires exactly 1 individual, got {len(code_pop)}"
             )
         code_parent = code_pop[0]
 
@@ -89,13 +88,13 @@ class AgentCoderEditOperator(BaseLLMOperator[CodeIndividual]):
 
         if not failing:
             logger.info(
-                "AgentCoderEditOperator: no failing tests — returning parent unchanged"
+                "AgentCoderRepairOperator: no failing tests — returning parent unchanged"
             )
             return [code_parent]
 
         if not self._conversation_history:
             raise ValueError(
-                "AgentCoderEditOperator: no conversation history. "
+                "AgentCoderRepairOperator: no conversation history. "
                 "Run AgentCoderInitializer first, or call reset_session()."
             )
 
@@ -124,13 +123,13 @@ class AgentCoderEditOperator(BaseLLMOperator[CodeIndividual]):
         edited_code = self.parser.remove_main_block(edited_code)
 
         probability = self.prob_assigner.assign_probability(
-            OPERATION_EDIT, [code_parent.probability]
+            "repair", [code_parent.probability]
         )
         return [
             CodeIndividual(
                 snippet=edited_code,
                 probability=probability,
-                creation_op=OPERATION_EDIT,
+                creation_op="repair",
                 generation_born=code_pop.generation + 1,
                 parents={
                     "code": [code_parent.id],
@@ -145,4 +144,4 @@ class AgentCoderEditOperator(BaseLLMOperator[CodeIndividual]):
         ]
 
 
-__all__ = ["AgentCoderEditOperator"]
+__all__ = ["AgentCoderRepairOperator"]

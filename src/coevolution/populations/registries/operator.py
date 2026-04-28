@@ -28,6 +28,46 @@ class OperatorRegistry(DIRegistry[IOperator[Any]]):
         cls = self._registry[population][name]
         return self._instantiate(cls, context)
 
+    def _extract_rates(
+        self, population: str, config: Dict[str, Any], section_name: str = "op_rates"
+    ) -> Dict[str, float]:
+        """Extract and validate sampling rates from a named config section."""
+        rates = config.get(section_name)
+        if rates is None:
+            raise ValueError(
+                f"Mandatory section '{section_name}' is missing for population '{population}'. "
+                f"Please update your YAML config."
+            )
+
+        registered_names = self.list_names(population)
+        
+        # 1. Validate that all operators listed in YAML are actually registered
+        for name in rates.keys():
+            if name not in registered_names:
+                raise ValueError(
+                    f"Operator '{name}' listed in '{section_name}' is not registered for "
+                    f"population '{population}'. Registered: {registered_names}"
+                )
+
+        # 2. Extract weights (only for those listed in the section)
+        weights = {name: float(weight) for name, weight in rates.items() if weight > 0}
+        
+        if not weights:
+            raise ValueError(
+                f"No non-zero weights found in '{section_name}' for '{population}'. "
+                f"At least one operator must be enabled."
+            )
+
+        # 3. Strict Sum-to-1.0 Validation
+        total = sum(weights.values())
+        if abs(total - 1.0) > 1e-6:
+            raise ValueError(
+                f"Operator weights in '{section_name}' for '{population}' must sum to 1.0, "
+                f"got {total:.4f} (from {weights})"
+            )
+
+        return weights
+
     def build_weighted_breeder(
         self,
         population: str,
@@ -38,40 +78,20 @@ class OperatorRegistry(DIRegistry[IOperator[Any]]):
 
         Args:
             population: The population type (e.g. 'code').
-            config: Dict of YAML configuration keys (e.g. {mutation_rate: 0.2}).
+            config: Dict of YAML configuration keys (must contain 'op_rates').
             dependencies: Common dependencies (llm, parser, parent_selector, etc.)
 
         Returns:
             A Breeder instance.
         """
-        registered_classes = self.get_all(population)
-        if not registered_classes:
-            raise ValueError(f"No operators registered for population '{population}'")
+        # 1. Extract and validate rates
+        weights = self._extract_rates(population, config)
 
-        # Combine config and explicit dependencies/overrides
+        # 2. Combine config and explicit dependencies for instantiation
         full_config = {**dependencies, **config}
 
-        # 1. Map registered names to their configured weights
-        weights: Dict[str, float] = {}
-        for name in registered_classes:
-            # Note: Operators use '{name}_rate' convention (e.g. mutation_rate)
-            weight = full_config.get(f"{name}_rate", 0.0)
-            if weight > 0:
-                weights[name] = weight
-
-        if not weights:
-            # Fallback for single-operator populations or old configs
-            # If only one operator is registered, give it 1.0 weight
-            if len(registered_classes) == 1:
-                name = list(registered_classes.keys())[0]
-                weights[name] = 1.0
-            else:
-                raise ValueError(
-                    f"No non-zero weights found in config for '{population}' operators. "
-                    f"Available: {self.list_names(population)}"
-                )
-
-        # 2. Instantiate weighted operators
+        # 3. Instantiate weighted operators
+        registered_classes = self.get_all(population)
         registered_ops: List[RegisteredOperator[Any]] = []
         
         for name, weight in weights.items():
@@ -79,7 +99,7 @@ class OperatorRegistry(DIRegistry[IOperator[Any]]):
             instance = self._instantiate(cls, full_config)
             registered_ops.append(RegisteredOperator(weight, instance))
 
-        # 3. Create Breeder
+        # 4. Create Breeder
         llm_workers = full_config.get("llm_workers")
         if llm_workers is None and "llm" in full_config:
             llm_workers = getattr(full_config["llm"], "workers", 1)

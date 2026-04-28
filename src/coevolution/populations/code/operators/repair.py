@@ -1,4 +1,4 @@
-"""CodeGenericEditOperator — guides code repair using failing tests."""
+"""CodeGenericRepairOperator — guides code repair using failing tests."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ from coevolution.core.interfaces import (
 from coevolution.core.interfaces.language import ICodeParser
 from coevolution.core.interfaces.probability import IProbabilityAssigner
 from coevolution.core.interfaces.selection import IParentSelectionStrategy
-from coevolution.core.interfaces.types import OPERATION_GENERIC_EDIT
+from coevolution.core.interfaces.types import OPERATION_GENERIC_REPAIR
 from coevolution.strategies.llm_base import (
     BaseLLMOperator,
     ILanguageModel,
@@ -31,9 +31,9 @@ from ._helpers import _CodeLLMHelpers
 type TestPopulationType = str
 
 
-@operator_registry.register("generic_edit", population="code")
-class CodeGenericEditOperator(_CodeLLMHelpers, BaseLLMOperator[CodeIndividual]):
-    """Self-sufficient operator for feedback-driven mutation (Edit).
+@operator_registry.register("generic_repair", population="code")
+class CodeGenericRepairOperator(_CodeLLMHelpers, BaseLLMOperator[CodeIndividual]):
+    """Self-sufficient operator for feedback-driven mutation (Repair).
 
     On each execute(context) call:
       1. Selects K failing tests (across all test populations).
@@ -58,7 +58,7 @@ class CodeGenericEditOperator(_CodeLLMHelpers, BaseLLMOperator[CodeIndividual]):
         self._failing_test_selector = failing_test_selector
 
     def operation_name(self) -> str:
-        return OPERATION_GENERIC_EDIT
+        return OPERATION_GENERIC_REPAIR
 
     @llm_retry(
         (
@@ -75,7 +75,7 @@ class CodeGenericEditOperator(_CodeLLMHelpers, BaseLLMOperator[CodeIndividual]):
 
         parents = self.parent_selector.select_parents(code_pop, 1, context)
         if not parents:
-            logger.warning("CodeGenericEditOperator: no parents available")
+            logger.warning("CodeGenericRepairOperator: no parents available")
             return []
         parent = parents[0]
 
@@ -84,7 +84,7 @@ class CodeGenericEditOperator(_CodeLLMHelpers, BaseLLMOperator[CodeIndividual]):
         )
         if not failing:
             logger.debug(
-                "CodeGenericEditOperator: no failing tests for this parent, skipping"
+                "CodeGenericRepairOperator: no failing tests for this parent, skipping"
             )
             return []
         failing_tests_data = []
@@ -107,13 +107,13 @@ class CodeGenericEditOperator(_CodeLLMHelpers, BaseLLMOperator[CodeIndividual]):
         edited_code = self._validated_code(edited_code, problem.starter_code, "edit")
 
         probability = self.prob_assigner.assign_probability(
-            OPERATION_GENERIC_EDIT, [parent.probability]
+            OPERATION_GENERIC_REPAIR, [parent.probability]
         )
         return [
             CodeIndividual(
                 snippet=edited_code,
                 probability=probability,
-                creation_op=OPERATION_GENERIC_EDIT,
+                creation_op=OPERATION_GENERIC_REPAIR,
                 generation_born=code_pop.generation + 1,
                 parents={
                     "code": [parent.id],
@@ -125,4 +125,4 @@ class CodeGenericEditOperator(_CodeLLMHelpers, BaseLLMOperator[CodeIndividual]):
         ]
 
 
-__all__ = ["CodeGenericEditOperator"]
+__all__ = ["CodeGenericRepairOperator"]

@@ -2,10 +2,10 @@
 
 from .mutation import UnittestMutationOperator
 from .crossover import UnittestCrossoverOperator
-from .edit import UnittestEditOperator
+from .repair import UnittestRepairOperator
 
 __all__ = [
     "UnittestMutationOperator",
     "UnittestCrossoverOperator",
-    "UnittestEditOperator",
+    "UnittestRepairOperator",
 ]

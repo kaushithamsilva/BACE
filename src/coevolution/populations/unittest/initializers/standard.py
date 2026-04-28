@@ -24,7 +24,7 @@ from coevolution.strategies.llm_base import (
 from ..operators._helpers import _TestLLMHelpers
 
 
-@initializer_registry.register("standard", population="unittest")
+@initializer_registry.register("unittest", population="unittest")
 class UnittestInitializer(_TestLLMHelpers, BaseLLMInitializer[TestIndividual]):
     """Creates Gen-0 test individuals via LLM.
 

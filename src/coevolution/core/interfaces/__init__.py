@@ -79,9 +79,10 @@ from .systems import IBeliefUpdater, IExecutionSystem, IInteractionLedger, Ledge
 # 1. Types and constants (no dependencies)
 from .types import (
     OPERATION_CROSSOVER,
-    OPERATION_EDIT,
+    OPERATION_GENERIC_REPAIR,
     OPERATION_INITIAL,
     OPERATION_MUTATION,
+    OPERATION_REPAIR,
     OPERATION_REPRODUCTION,
     InteractionKey,
     LifecycleEvent,
@@ -96,9 +97,10 @@ __all__ = [
     "LifecycleEvent",
     "Operation",
     "OPERATION_CROSSOVER",
-    "OPERATION_EDIT",
+    "OPERATION_GENERIC_REPAIR",
     "OPERATION_INITIAL",
     "OPERATION_MUTATION",
+    "OPERATION_REPAIR",
     "OPERATION_REPRODUCTION",
     "ParentDict",
     "ParentProbabilities",

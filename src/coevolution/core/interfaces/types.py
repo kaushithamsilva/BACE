@@ -15,10 +15,10 @@ type ParentDict = dict[Literal["code", "test"], list[str]]
 # Standard operation names (for convenience, not exhaustive)
 OPERATION_INITIAL: Literal["initial"] = "initial"
 OPERATION_CROSSOVER: Literal["crossover"] = "crossover"
-OPERATION_EDIT: Literal["edit"] = "edit"
+OPERATION_REPAIR: Literal["repair"] = "repair"
 OPERATION_REPRODUCTION: Literal["reproduction"] = "reproduction"
 OPERATION_MUTATION: Literal["mutation"] = "mutation"
-OPERATION_GENERIC_EDIT: Literal["generic_edit"] = "generic_edit"
+OPERATION_GENERIC_REPAIR: Literal["generic_repair"] = "generic_repair"
 
 
 class LifecycleEvent(Enum):

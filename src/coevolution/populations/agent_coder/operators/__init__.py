@@ -1,5 +1,5 @@
 """Agent-coder population — operators package."""
 
-from .edit import AgentCoderEditOperator
+from .repair import AgentCoderRepairOperator
 
-__all__ = ["AgentCoderEditOperator"]
+__all__ = ["AgentCoderRepairOperator"]

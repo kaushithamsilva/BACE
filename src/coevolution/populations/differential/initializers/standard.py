@@ -11,7 +11,7 @@ from coevolution.strategies.llm_base import BaseLLMInitializer
 from coevolution.populations.registries import initializer_registry
 
 
-@initializer_registry.register("standard", population="differential")
+@initializer_registry.register("differential", population="differential")
 class DifferentialInitializer(BaseLLMInitializer[TestIndividual]):
     """Differential tests start empty — Gen 0 is always []."""
 

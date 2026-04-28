@@ -1,4 +1,4 @@
-"""UnittestEditOperator — improves test discriminating power using code context."""
+"""UnittestRepairOperator — improves test discriminating power using code context."""
 
 from __future__ import annotations
 
@@ -8,7 +8,6 @@ from loguru import logger
 
 from coevolution.core.individual import TestIndividual
 from coevolution.core.interfaces import (
-    OPERATION_EDIT,
     CoevolutionContext,
 )
 from coevolution.core.interfaces.language import (
@@ -25,9 +24,9 @@ from coevolution.populations.registries import operator_registry
 from ._helpers import _TestLLMHelpers
 
 
-@operator_registry.register("edit", population="unittest")
-class UnittestEditOperator(_TestLLMHelpers, BaseLLMOperator[TestIndividual]):
-    """Edit: improve a test's discriminating power using passing/failing code context.
+@operator_registry.register("repair", population="unittest")
+class UnittestRepairOperator(_TestLLMHelpers, BaseLLMOperator[TestIndividual]):
+    """Repair: improve a test's discriminating power using passing/failing code context.
 
     Three edit modes (auto-selected by what interaction data is available):
     - discriminating  : has passing AND failing code → edit to discriminate harder
@@ -36,7 +35,7 @@ class UnittestEditOperator(_TestLLMHelpers, BaseLLMOperator[TestIndividual]):
     """
 
     def operation_name(self) -> str:
-        return OPERATION_EDIT
+        return "repair"
 
     @llm_retry(
         (
@@ -128,20 +127,20 @@ class UnittestEditOperator(_TestLLMHelpers, BaseLLMOperator[TestIndividual]):
                 passing_code_snippet_Q=passing_inds[1].snippet,
             )
 
-        logger.debug(f"UnittestEditOperator: using '{edit_type}' edit mode")
+        logger.debug(f"UnittestRepairOperator: using '{edit_type}' edit mode")
         response = self._generate(prompt)
         extracted = self._extract_code_block(response)
         clean_block = self.parser.remove_main_block(extracted)
         edited = self._extract_first_test_function(clean_block)
 
         probability = self.prob_assigner.assign_probability(
-            OPERATION_EDIT, [parent.probability]
+            "repair", [parent.probability]
         )
         return [
             TestIndividual(
                 snippet=edited,
                 probability=probability,
-                creation_op=OPERATION_EDIT,
+                creation_op="repair",
                 generation_born=test_pop.generation + 1,
                 parents={
                     "code": [ind.id for ind in passing_inds + failing_inds],
@@ -153,4 +152,4 @@ class UnittestEditOperator(_TestLLMHelpers, BaseLLMOperator[TestIndividual]):
         ]
 
 
-__all__ = ["UnittestEditOperator"]
+__all__ = ["UnittestRepairOperator"]

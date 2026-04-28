@@ -1,5 +1,5 @@
-# Standard Code Profile
-# Balanced settings for code evolution
+# Planning Code Profile
+# Uses plan-then-code initialization
 
 initial_prior: 0.2
 initial_population_size: 10
@@ -8,12 +8,14 @@ offspring_rate: 0.3
 elitism_rate: 0.3
 
 # Operation rates (must sum to 1.0)
-mutation_rate: 0.2
-crossover_rate: 0.2
-generic_edit_rate: 0.6
+op_rates:
+  mutation: 0.2
+  crossover: 0.2
+  generic_repair: 0.6
 
-# Edit operation settings
-k_failing_tests: 10  # Max number of failing tests to use for edit
+# Initialization rates (must sum to 1.0)
+init_rates:
+  planning: 1.0
 
 # Performance settings
 init_pop_batch_size: 2
@@ -21,6 +23,3 @@ init_pop_batch_size: 2
 # Selection strategy
 diversity_enabled: true
 prob_assigner_strategy: "min"
-# Initializer rates (must have at least one > 0)
-standard_init_rate: 0.0
-planning_init_rate: 1.0

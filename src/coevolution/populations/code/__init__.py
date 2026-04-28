@@ -4,7 +4,7 @@ from .profile import create_default_code_profile
 from .operators import (
     CodeMutationOperator,
     CodeCrossoverOperator,
-    CodeGenericEditOperator,
+    CodeGenericRepairOperator,
 )
 from .initializers import (
     DirectCodeInitializer,
@@ -14,6 +14,6 @@ __all__ = [
     "create_default_code_profile",
     "CodeMutationOperator",
     "CodeCrossoverOperator",
-    "CodeGenericEditOperator",
+    "CodeGenericRepairOperator",
     "DirectCodeInitializer",
 ]

@@ -22,14 +22,14 @@ from coevolution.strategies.llm_base import (
     LLMSyntaxError,
     llm_retry,
 )
-from ..operators.edit import AgentCoderEditOperator
+from ..operators.repair import AgentCoderRepairOperator
 
 
 @initializer_registry.register("agent_coder", population="agent_coder")
 class AgentCoderInitializer(BaseLLMInitializer[CodeIndividual]):
     """Turn 0 of the AgentCoder loop: generates the first solution and seeds history.
 
-    MUST be called before AgentCoderEditOperator.execute().
+    MUST be called before AgentCoderRepairOperator.execute().
     Pass the same operator instance to both so they share conversation history.
     """
 
@@ -38,7 +38,7 @@ class AgentCoderInitializer(BaseLLMInitializer[CodeIndividual]):
         llm: ILanguageModel,
         parser: ICodeParser,
         language_name: str,
-        edit_operator: AgentCoderEditOperator,
+        edit_operator: AgentCoderRepairOperator,
     ) -> None:
         super().__init__(llm, parser, language_name)
         self._edit_operator = edit_operator

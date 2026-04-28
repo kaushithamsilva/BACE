@@ -2,10 +2,13 @@
 
 from .mutation import CodeMutationOperator
 from .crossover import CodeCrossoverOperator
-from .edit import CodeGenericEditOperator
+from .repair import CodeGenericRepairOperator
+from .specialized_repair import UnittestCodeRepairOperator, PropertyCodeRepairOperator
 
 __all__ = [
     "CodeMutationOperator",
     "CodeCrossoverOperator",
-    "CodeGenericEditOperator",
+    "CodeGenericRepairOperator",
+    "UnittestCodeRepairOperator",
+    "PropertyCodeRepairOperator",
 ]

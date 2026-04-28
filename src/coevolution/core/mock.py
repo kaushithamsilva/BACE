@@ -10,9 +10,9 @@ from coevolution.utils import logging as logging_utils
 from .individual import CodeIndividual, TestIndividual
 from .interfaces import (
     OPERATION_CROSSOVER,
-    OPERATION_EDIT,
     OPERATION_INITIAL,
     OPERATION_MUTATION,
+    OPERATION_REPAIR,
     BaseIndividual,
     BasePopulation,
     BayesianConfig,
@@ -111,7 +111,7 @@ class MockCodeOperator:
         parent = code_pop[parent_idx]
 
         # Generate offspring snippet
-        op = np.random.choice([OPERATION_MUTATION, OPERATION_CROSSOVER, OPERATION_EDIT])
+        op = np.random.choice([OPERATION_MUTATION, OPERATION_CROSSOVER, OPERATION_REPAIR])
         parents: dict[Literal["code", "test"], list[str]] = {
             "code": [parent.id],
             "test": [],
@@ -127,8 +127,8 @@ class MockCodeOperator:
             p2 = code_pop[p2_idx]
             parents["code"].append(p2.id)
             prob = float(np.mean([parent.probability, p2.probability]))
-        else:  # OPERATION_EDIT
-            snippet = f"# edited code snippet v{np.random.randint(100)}"
+        else:  # OPERATION_REPAIR
+            snippet = f"# repaired code snippet v{np.random.randint(100)}"
             # Select a random evolved test as a cross-species parent
             evolved_tests = []
             for t_pop in context.test_populations.values():
@@ -195,7 +195,7 @@ class MockTestOperator:
         parent_idx = int(np.random.choice(len(probs), p=p_normalized))
         parent = test_pop[parent_idx]
 
-        op = np.random.choice([OPERATION_MUTATION, OPERATION_CROSSOVER, OPERATION_EDIT])
+        op = np.random.choice([OPERATION_MUTATION, OPERATION_CROSSOVER, OPERATION_REPAIR])
         parents: dict[Literal["code", "test"], list[str]] = {
             "code": [],
             "test": [parent.id],
@@ -212,8 +212,8 @@ class MockTestOperator:
             p2 = test_pop[p2_idx]
             parents["test"].append(p2.id)
             prob = float(np.mean([parent.probability, p2.probability]))
-        else:  # OPERATION_EDIT
-            snippet = f"def test_edited_{np.random.randint(1000)}(): pass  # edited"
+        else:  # OPERATION_REPAIR
+            snippet = f"def test_repaired_{np.random.randint(1000)}(): pass  # repaired"
             # Select a random code individual as a cross-species parent
             code_pop = context.code_population
             if code_pop.size > 0:

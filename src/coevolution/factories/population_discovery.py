@@ -94,7 +94,11 @@ class PopulationDiscoveryService:
             "cpu_workers": self.cpu_workers,
         }
 
+        has_kwargs = any(p.kind == inspect.Parameter.VAR_KEYWORD for p in sig.parameters.values())
+
         for param_name, param in sig.parameters.items():
+            if param.kind == inspect.Parameter.VAR_KEYWORD:
+                continue # Handled by has_kwargs logic
             if param_name in config:
                 kwargs[param_name] = config[param_name]
             elif param_name in common_deps:
@@ -108,5 +112,12 @@ class PopulationDiscoveryService:
                     f"Parameter '{param_name}' required by {factory.__name__} "
                     f"not found in config or common dependencies."
                 )
+
+        if has_kwargs:
+            # Pass all keys from config that weren't explicitly handled
+            # (although passing all of them is usually fine as long as names don't clash)
+            for k, v in config.items():
+                if k not in kwargs:
+                    kwargs[k] = v
 
         return factory(**kwargs)

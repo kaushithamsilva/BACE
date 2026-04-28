@@ -4,15 +4,17 @@ max_population_size: 15
 offspring_rate: 0.2
 elitism_rate: 1.0
 
+# Operation rates (must sum to 1.0)
+op_rates:
+  adversarial_refiner: 1.0
+
+# Initializer rates (must sum to 1.0)
+init_rates:
+  property: 1.0
+
 alpha: 0.05
 beta: 0.3
 gamma: 0.25
 learning_rate: 0.1
 
 num_inputs: 60
-
-adversarial_refiner_rate: 1.0
-noop_rate: 0.0
-
-# Initializer rates
-property_init_rate: 1.0

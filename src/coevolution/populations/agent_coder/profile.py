@@ -18,7 +18,6 @@ from coevolution.core.interfaces.language import ILanguage
 from infrastructure.llm_client import LLMClient
 
 from coevolution.strategies.breeding.breeder import Breeder
-from coevolution.core.interfaces.operators import RegisteredOperator
 from coevolution.strategies.probability.assigner import ProbabilityAssigner
 from coevolution.strategies.selection.elite import TopKEliteSelector
 from coevolution.strategies.selection.parent_selection import (
@@ -26,7 +25,7 @@ from coevolution.strategies.selection.parent_selection import (
 )
 
 # Operators/Initializers imported here to ensure decorators are run
-from .operators.edit import AgentCoderEditOperator  # noqa: F401
+from .operators.repair import AgentCoderRepairOperator  # noqa: F401
 from .initializers import AgentCoderInitializer  # noqa: F401
 
 
@@ -60,19 +59,14 @@ def create_agent_coder_code_profile(
         RouletteWheelParentSelection()
     )
 
-    edit_op = operator_registry.build_operator(
-        name="edit",
+    breeder: Breeder[CodeIndividual] = operator_registry.build_weighted_breeder(
         population="agent_coder",
+        config=factory_config,
         llm=llm_client,
         parser=language_adapter.parser,
         language_name=language_adapter.language,
         parent_selector=parent_selector,
         prob_assigner=prob_assigner,
-    )
-
-    breeder: Breeder[CodeIndividual] = Breeder(
-        registered_operators=[RegisteredOperator(weight=1.0, operator=edit_op)],
-        llm_workers=llm_client.workers,
     )
 
     initializer: IPopulationInitializer[CodeIndividual] = (
@@ -83,7 +77,6 @@ def create_agent_coder_code_profile(
             parser=language_adapter.parser,
             language_name=language_adapter.language,
             pop_config=population_config,
-            edit_operator=edit_op,
         )
     )
 

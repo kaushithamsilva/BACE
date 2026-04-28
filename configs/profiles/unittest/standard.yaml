@@ -7,10 +7,15 @@ max_population_size: 20
 offspring_rate: 0.8
 elitism_rate: 0.4
 
-# Operation rates
-mutation_rate: 0.3
-crossover_rate: 0.2
-edit_rate: 0.5
+# Operation rates (must sum to 1.0)
+op_rates:
+  mutation: 0.3
+  crossover: 0.2
+  repair: 0.5
+
+# Initializer rates (must sum to 1.0)
+init_rates:
+  unittest: 1.0
 
 # Bayesian reliability parameters
 alpha: 0.1  # P(pass | code correct, test incorrect)
@@ -23,6 +28,3 @@ diversity_enabled: true
 
 # Probability assigner strategy: one of ["min", "mean", "max", "init"]
 prob_assigner_strategy: "min"
-
-# Initializer rates
-unittest_init_rate: 1.0

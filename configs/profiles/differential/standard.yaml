@@ -7,8 +7,13 @@ max_population_size: 100
 offspring_rate: 0.5
 elitism_rate: 0.3
 
-# Operation rate (discovery-only initially)
-discovery_rate: 1.0
+# Operation rates (must sum to 1.0)
+op_rates:
+  discovery: 1.0
+
+# Initializer rates (must sum to 1.0)
+init_rates:
+  differential: 1.0
 
 # Bayesian reliability parameters
 alpha: 0.1  # P(pass | code correct, test incorrect)
@@ -24,6 +29,3 @@ num_passing_tests_to_sample: 5  # Number of passing test cases to randomly sampl
 
 # Probability assigner strategy: one of ["min", "mean", "max", "init"]
 prob_assigner_strategy: "min"
-
-# Initializer rates
-differential_init_rate: 1.0
