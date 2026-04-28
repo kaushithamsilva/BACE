@@ -590,7 +590,8 @@ class Orchestrator:
         """
         code_pop = context.code_population
 
-        # --- 1. Evolve Code (If Active) ---
+        # --- 1. Breed Code (If Active) ---
+        new_code_inds = None
         if evolve_code:
             logger.debug("Active Phase: Evolving Code Population...")
 
@@ -609,21 +610,15 @@ class Orchestrator:
             code_offsprings = self._breed_code(context, len(code_elites))
             logger.debug(f"Generated {len(code_offsprings)} code offsprings.")
 
-            # Transition
             new_code_inds = code_elites + code_offsprings
-            self._notify_removed_individuals(code_pop, new_code_inds, "code")
-            code_pop.set_next_generation(new_code_inds)
-            logger.info(
-                f"Code Population transitioned to generation {code_pop.generation}."
-            )
         else:
             logger.debug("Frozen Phase: Code Population is static this generation.")
 
-        # --- 2. Evolve Tests (If Active) ---
+        # --- 2. Breed Tests (If Active) ---
+        next_test_generation_inds: dict[str, list[TestIndividual]] = {}
         if evolve_tests:
             logger.debug("Active Phase: Evolving Test Populations...")
 
-            # We select elites here to ensure we breed from the best *current* tests
             for test_type in self.evolved_test_types:
                 logger.info(f"Evolving {test_type} test elites...")
                 test_pop = context.test_populations[test_type]
@@ -651,15 +646,28 @@ class Orchestrator:
                 logger.debug(
                     f"Generated {len(test_offsprings)} {test_type} test offsprings."
                 )
-                # Transition
-                new_test_inds = test_elites + test_offsprings
-                self._notify_removed_individuals(test_pop, new_test_inds, test_type)
-                test_pop.set_next_generation(new_test_inds)
-                logger.info(
-                    f"{test_type.capitalize()} Test Population transitioned to generation {test_pop.generation}."
-                )
+                next_test_generation_inds[test_type] = test_elites + test_offsprings
         else:
             logger.debug("Frozen Phase: Test Populations are static this generation.")
+
+        # --- 3. Transition All Populations ---
+        # We transition only AFTER all breeding is complete to ensure
+        # that operators (like DifferentialDiscovery) have a consistent
+        # view of population sizes vs interaction data.
+        if new_code_inds is not None:
+            self._notify_removed_individuals(code_pop, new_code_inds, "code")
+            code_pop.set_next_generation(new_code_inds)
+            logger.info(
+                f"Code Population transitioned to generation {code_pop.generation}."
+            )
+
+        for test_type, new_inds in next_test_generation_inds.items():
+            test_pop = context.test_populations[test_type]
+            self._notify_removed_individuals(test_pop, new_inds, test_type)
+            test_pop.set_next_generation(new_inds)
+            logger.info(
+                f"{test_type.capitalize()} Test Population transitioned to generation {test_pop.generation}."
+            )
 
     # =========================================================================
     # Lifecycle Phase 3: Finalization
