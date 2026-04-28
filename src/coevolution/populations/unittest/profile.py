@@ -8,7 +8,6 @@ from coevolution.core.interfaces import (
     BayesianConfig,
     IPopulationInitializer,
     PopulationConfig,
-    PublicTestProfile,
     TestProfile,
 )
 from coevolution.populations.registries import (
@@ -135,22 +134,4 @@ def create_unittest_test_profile(
     )
 
 
-@profile_registry.public_factory("public")
-def create_public_test_profile(
-    alpha: float = 0.001,
-    beta: float = 0.1,
-    gamma: float = 0.1,
-    learning_rate: float = 0.05,
-) -> PublicTestProfile:
-    """Create a public/ground-truth test profile (fixed tests, no evolution)."""
-    return PublicTestProfile(
-        bayesian_config=BayesianConfig(
-            alpha=alpha,
-            beta=beta,
-            gamma=gamma,
-            learning_rate=learning_rate,
-        )
-    )
-
-
-__all__ = ["create_unittest_test_profile", "create_public_test_profile"]
+__all__ = ["create_unittest_test_profile"]

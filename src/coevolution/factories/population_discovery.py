@@ -46,19 +46,26 @@ class PopulationDiscoveryService:
             "evolved_test_profiles": {},
             "public_test_profile": None,
         }
+        injected_repair_ops: dict[str, Any] = {}
 
         # 1. Public Profile
         public_cfg = experiment_config.get("public_profile")
         if public_cfg:
-            results["public_test_profile"] = self._construct_profile(
+            profile = self._construct_profile(
                 self.registry.get_public_factory("public"), public_cfg
             )
+            results["public_test_profile"] = profile
+            
+            # Collect repair operators from the public (anchor) profile
+            for reg_op in profile.repair_operators:
+                name = reg_op.operator.operation_name()
+                injected_repair_ops[name] = reg_op.operator
+                logger.debug(f"Collected injected repair operator '{name}' from 'public' profile")
+            
             logger.info("Constructed public test profile")
 
         # 2. Evolved Test Populations
         # We iterate through all registered test populations and see if they are in the config
-        injected_repair_ops: dict[str, Any] = {}
-
         for test_type in self.registry.registered_test_populations:
             profile_key = f"{test_type}_profile"
             test_cfg = experiment_config.get(profile_key)

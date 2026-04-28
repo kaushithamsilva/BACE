@@ -5,7 +5,7 @@ Adding a new population:
 2. Import the factory in factories/__init__.py
 """
 
-from . import agent_coder, code, differential, property, unittest
+from . import agent_coder, code, differential, property, public, unittest
 from .registries import profile_registry
 
-__all__ = ["code", "unittest", "differential", "agent_coder", "property", "profile_registry"]
+__all__ = ["code", "unittest", "differential", "agent_coder", "property", "public", "profile_registry"]

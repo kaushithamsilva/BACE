@@ -85,6 +85,7 @@ class PublicTestProfile:
     """
 
     bayesian_config: BayesianConfig
+    repair_operators: tuple["RegisteredOperator[CodeIndividual]", ...] = field(default_factory=tuple)
 
 
 @dataclass(frozen=True)
