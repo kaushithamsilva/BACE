@@ -55,7 +55,6 @@ def create_property_test_profile(
     **factory_config: Any,
 ) -> TestProfile:
     """Create a complete property test population profile."""
-    # ... (function body)
     pop_config = PopulationConfig(
         initial_prior=initial_prior,
         initial_population_size=initial_population_size,
