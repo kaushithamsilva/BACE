@@ -39,42 +39,41 @@ class FailingTestSelector:
         coevolution_context: CoevolutionContext,
         code_individual: CodeIndividual,
         k: int = 10,
+        test_type_filter: str | None = None,
     ) -> list[tuple[TestIndividual, TestPopulationType]]:
         """Select up to k failing tests for the given code individual.
 
-        Aggregates failing tests from all test populations and uses rank selection
-        to pick up to k tests, favoring tests with higher belief (probability).
-        If fewer than k failing tests exist, returns all available failing tests.
+        Aggregates failing tests from all test populations (or a specific type)
+        and uses rank selection to pick up to k tests, favoring tests with
+        higher belief (probability).
 
         Args:
-            coevolution_context: Current coevolution context with populations and interactions.
+            coevolution_context: Current coevolution context.
             code_individual: The code individual for which to select failing tests.
             k: Maximum number of failing tests to select (default: 10).
+            test_type_filter: Optional population type to filter by (e.g. 'unittest').
 
         Returns:
             A list of tuples (selected_test_individual, test_population_type).
-            Empty list if no failing tests are found.
         """
         # List of candidates: (TestIndividual, TestPopulationType)
         candidates: list[tuple[TestIndividual, TestPopulationType]] = []
 
         # Iterate over all test populations (Unit, Differential, Public, etc.)
         for test_type, test_pop in coevolution_context.test_populations.items():
+            if test_type_filter and test_type != test_type_filter:
+                continue
+
             if test_type not in coevolution_context.interactions:
-                logger.warning(f"No interaction data for test population '{test_type}'")
                 continue
 
             interaction = coevolution_context.interactions[test_type]
             if code_individual.id not in interaction.execution_results:
-                logger.warning(
-                    f"No execution results for code individual '{code_individual.id}' "
-                    f"in test population '{test_type}'"
-                )
                 continue
 
             test_results = interaction.execution_results[code_individual.id]
 
-            # Get tests that failed against this code individual using the execution results
+            # Get tests that failed against this code individual
             for test_ind in test_pop:
                 if test_results[test_ind.id].status in ["failed", "error"]:
                     candidates.append((test_ind, test_type))
