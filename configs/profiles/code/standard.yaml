@@ -11,8 +11,7 @@ elitism_rate: 0.3
 op_rates:
   mutation: 0.1
   crossover: 0.1
-  generic_repair: 0.4
-  unittest_repair: 0.2
+  generic_repair: 0.6
   property_repair: 0.2
 
 # Initialization rates (must sum to 1.0)

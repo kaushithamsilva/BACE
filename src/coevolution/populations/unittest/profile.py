@@ -102,36 +102,13 @@ def create_unittest_test_profile(
         learning_rate=learning_rate,
     )
 
-    # Bring in specialized repair operator for code
-    # This is registered for population="code" but owned by unittest profile
-    from coevolution.core.interfaces.operators import RegisteredOperator
-    from coevolution.strategies.selection.failing_test_selection import FailingTestSelector
-
-    from .operators.code_repair import UnittestCodeRepairOperator
-
-    unittest_code_repair = RegisteredOperator(
-        weight=0.0,  # Weight is managed by CodeProfile YAML
-        operator=operator_registry._instantiate(
-            UnittestCodeRepairOperator,
-            {
-                **factory_config,
-                "llm": llm_client,
-                "parser": language_adapter.parser,
-                "language_name": language_adapter.language,
-                "parent_selector": parent_selector,
-                "prob_assigner": prob_assigner,
-                "failing_test_selector": FailingTestSelector,
-            },
-        ),
-    )
-
     return TestProfile(
         population_config=population_config,
         breeder=breeder,
         initializer=initializer,
         elite_selector=elite_selector,
         bayesian_config=bayesian_config,
-        repair_operators=(unittest_code_repair,),
+        repair_operators=(),
     )
 
 

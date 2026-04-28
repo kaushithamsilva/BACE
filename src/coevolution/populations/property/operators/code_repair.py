@@ -22,7 +22,7 @@ class PropertyCodeRepairOperator(CodeGenericRepairOperator):
             return []
         parent = parents[0]
 
-        # Use the NEW filter capability
+        # Use the filter capability
         failing = self._failing_test_selector.select_k_failing_tests(
             context, parent, k=self.k_failing_tests, test_type_filter="property"
         )
@@ -60,3 +60,6 @@ class PropertyCodeRepairOperator(CodeGenericRepairOperator):
                 metadata={"num_failing_tests": len(failing), "target_test_type": "property"},
             )
         ]
+
+    def operation_name(self) -> str:
+        return "property_repair"

@@ -52,10 +52,12 @@ class CodeGenericRepairOperator(_CodeLLMHelpers, BaseLLMOperator[CodeIndividual]
         prob_assigner: IProbabilityAssigner,
         failing_test_selector: type[FailingTestSelector] = FailingTestSelector,
         k_failing_tests: int = 10,
+        target_test_type: str | None = None,
     ) -> None:
         super().__init__(llm, parser, language_name, parent_selector, prob_assigner)
         self.k_failing_tests = k_failing_tests
         self._failing_test_selector = failing_test_selector
+        self.target_test_type = target_test_type
 
     def operation_name(self) -> str:
         return OPERATION_GENERIC_REPAIR
@@ -80,7 +82,7 @@ class CodeGenericRepairOperator(_CodeLLMHelpers, BaseLLMOperator[CodeIndividual]
         parent = parents[0]
 
         failing = self._failing_test_selector.select_k_failing_tests(
-            context, parent, k=self.k_failing_tests
+            context, parent, k=self.k_failing_tests, test_type_filter=self.target_test_type
         )
         if not failing:
             logger.debug(
@@ -120,7 +122,10 @@ class CodeGenericRepairOperator(_CodeLLMHelpers, BaseLLMOperator[CodeIndividual]
                     "test": [t.id for t, _ in failing],
                 },
                 explanation=self.parser.get_docstring(edited_code),
-                metadata={"num_failing_tests": len(failing)},
+                metadata={
+                    "num_failing_tests": len(failing),
+                    "target_test_type": self.target_test_type,
+                },
             )
         ]
 
