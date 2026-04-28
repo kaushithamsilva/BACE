@@ -8,7 +8,6 @@ from coevolution.populations.registries import profile_registry, operator_regist
 from coevolution.core.interfaces.language import ILanguage
 from coevolution.strategies.llm_base import ILanguageModel
 from coevolution.core.interfaces.operators import RegisteredOperator
-from coevolution.strategies.selection.failing_test_selection import FailingTestSelector
 
 from .operators.code_repair import PublicCodeRepairOperator
 
@@ -35,7 +34,6 @@ def create_public_test_profile(
                 "llm": llm_client,
                 "parser": language_adapter.parser,
                 "language_name": language_adapter.language,
-                "failing_test_selector": FailingTestSelector,
                 **factory_config,
             },
         ),
