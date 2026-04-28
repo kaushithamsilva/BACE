@@ -113,7 +113,7 @@ def create_differential_test_profile(
         func_eq_selector=FunctionallyEqSelector(),
         max_pairs_per_group=max_pairs_per_group,
         num_passing_tests_to_sample=num_passing_tests_to_sample,
-        llm_workers=llm_client.workers,
+        llm_workers=1,  # Sequential execution: DiscoveryOperator handles internal parallelism
         pair_workers=pair_workers,
         # Default rates if not in factory_config
         discovery_rate=discovery_rate,
