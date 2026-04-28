@@ -2,64 +2,42 @@
 
 from __future__ import annotations
 
-from coevolution.core.individual import CodeIndividual
-from coevolution.core.interfaces import CoevolutionContext
-from coevolution.populations.registries import operator_registry
+from typing import Any
+
+from coevolution.core.interfaces.language import ICodeParser
+from coevolution.core.interfaces.operators import ILanguageModel
+from coevolution.core.interfaces.probability import IProbabilityAssigner
+from coevolution.core.interfaces.selection import IParentSelectionStrategy
 from coevolution.populations.code.operators.repair import CodeGenericRepairOperator
+from coevolution.populations.registries import operator_registry
+from coevolution.strategies.selection.failing_test_selection import FailingTestSelector
 
 
 @operator_registry.register("property_repair", population="code")
 class PropertyCodeRepairOperator(CodeGenericRepairOperator):
-    """Specialized repair operator that only uses Property test failures."""
+    """Specialized wrapper that fixes 'target_test_type' to 'property'."""
 
-    def execute(self, context: CoevolutionContext) -> list[CodeIndividual]:
-        """Repair using ONLY failing property tests."""
-        code_pop = context.code_population
-        problem = context.problem
-
-        parents = self.parent_selector.select_parents(code_pop, 1, context)
-        if not parents:
-            return []
-        parent = parents[0]
-
-        # Use the filter capability
-        failing = self._failing_test_selector.select_k_failing_tests(
-            context, parent, k=self.k_failing_tests, test_type_filter="property"
+    def __init__(
+        self,
+        llm: ILanguageModel,
+        parser: ICodeParser,
+        language_name: str,
+        parent_selector: IParentSelectionStrategy,
+        prob_assigner: IProbabilityAssigner,
+        failing_test_selector: type[FailingTestSelector] = FailingTestSelector,
+        k_failing_tests: int = 10,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(
+            llm=llm,
+            parser=parser,
+            language_name=language_name,
+            parent_selector=parent_selector,
+            prob_assigner=prob_assigner,
+            failing_test_selector=failing_test_selector,
+            k_failing_tests=k_failing_tests,
+            target_test_type="property",
         )
-        if not failing:
-            return []
-        
-        failing_tests_data = []
-        for test_ind, test_pop_type in failing:
-            exec_result = context.interactions[test_pop_type].execution_results
-            trace = exec_result[parent.id][test_ind.id].error_log or "No trace available"
-            failing_tests_data.append({"snippet": test_ind.snippet, "trace": trace})
-
-        prompt = self.prompt_manager.render_prompt(
-            "operators/code/edit.j2",
-            question_content=problem.question_content,
-            starter_code=problem.starter_code,
-            individual=parent.snippet,
-            failing_tests=failing_tests_data,
-        )
-        response = self._generate(prompt)
-        edited_code = self._extract_code_block(response)
-        edited_code = self._validated_code(edited_code, problem.starter_code, "edit")
-
-        probability = self.prob_assigner.assign_probability(
-            self.operation_name(), [parent.probability]
-        )
-        return [
-            CodeIndividual(
-                snippet=edited_code,
-                probability=probability,
-                creation_op=self.operation_name(),
-                generation_born=code_pop.generation + 1,
-                parents={"code": [parent.id], "test": [t.id for t, _ in failing]},
-                explanation=self.parser.get_docstring(edited_code),
-                metadata={"num_failing_tests": len(failing), "target_test_type": "property"},
-            )
-        ]
 
     def operation_name(self) -> str:
         return "property_repair"

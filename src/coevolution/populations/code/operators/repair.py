@@ -109,13 +109,13 @@ class CodeGenericRepairOperator(_CodeLLMHelpers, BaseLLMOperator[CodeIndividual]
         edited_code = self._validated_code(edited_code, problem.starter_code, "edit")
 
         probability = self.prob_assigner.assign_probability(
-            OPERATION_GENERIC_REPAIR, [parent.probability]
+            self.operation_name(), [parent.probability]
         )
         return [
             CodeIndividual(
                 snippet=edited_code,
                 probability=probability,
-                creation_op=OPERATION_GENERIC_REPAIR,
+                creation_op=self.operation_name(),
                 generation_born=code_pop.generation + 1,
                 parents={
                     "code": [parent.id],
