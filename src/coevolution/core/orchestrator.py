@@ -755,6 +755,7 @@ class Orchestrator:
                 probability=ind.probability,
                 parents=getattr(ind, "parents", None),
                 initializer_name=ind.metadata.get("initializer"),
+                explanation=ind.explanation,
             )
 
         code_population = CodePopulation(code_individuals, generation=0)
@@ -786,6 +787,7 @@ class Orchestrator:
                 parents=getattr(ind, "parents", None),
                 test_type=test_type,
                 initializer_name=ind.metadata.get("initializer"),
+                explanation=ind.explanation,
             )
 
         test_population = TestPopulation(
@@ -841,6 +843,7 @@ class Orchestrator:
                 probability=ind.probability,
                 parents=ind.parents,  # type: ignore
                 test_type=test_type,
+                explanation=ind.explanation,
             )
 
         # Create and return the test population
@@ -960,6 +963,7 @@ class Orchestrator:
                 operation=getattr(ind, "creation_op", "UNKNOWN"),
                 probability=ind.probability,
                 parents=getattr(ind, "parents", None),
+                explanation=ind.explanation,
             )
 
         logger.debug(f"Successfully bred {len(code_offspring)} code offspring")
@@ -993,6 +997,7 @@ class Orchestrator:
                 probability=ind.probability,
                 parents=getattr(ind, "parents", None),
                 test_type=test_type,
+                explanation=ind.explanation,
             )
 
         logger.debug(f"Successfully bred {len(test_offsprings)} test offspring")

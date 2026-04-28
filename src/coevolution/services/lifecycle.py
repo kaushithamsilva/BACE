@@ -46,6 +46,7 @@ class LifecycleEmitter:
         parents: dict[str, list[str]] | None = None,
         test_type: str | None = None,
         initializer_name: str | None = None,
+        explanation: str | None = None,
     ) -> None:
         """
         Log the birth of a new individual. Includes the raw `snippet`!
@@ -55,6 +56,7 @@ class LifecycleEmitter:
             initializer_name: Class name of the concrete initializer that created
                               this individual (e.g. 'StandardCodeInitializer').
                               Only set for Gen-0 individuals; None for bred offspring.
+            explanation: A high-level explanation or plan for the individual.
         """
         parents_dict = parents if parents is not None else {"code": [], "test": []}
 
@@ -75,6 +77,7 @@ class LifecycleEmitter:
             parents=parents_dict,
             test_type=test_type,
             initializer_name=initializer_name,
+            explanation=explanation,
         )
 
         for p_type, p_ids in parents_dict.items():
