@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from coevolution.core.interfaces.language import ICodeParser
-from coevolution.core.interfaces.operators import ILanguageModel
+from coevolution.strategies.llm_base import ILanguageModel
 from coevolution.core.interfaces.probability import IProbabilityAssigner
 from coevolution.core.interfaces.selection import IParentSelectionStrategy
 from coevolution.populations.code.operators.repair import CodeGenericRepairOperator
