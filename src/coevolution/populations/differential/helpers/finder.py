@@ -19,7 +19,7 @@ from coevolution.core.interfaces.language import (
 from infrastructure.languages import PythonLanguage
 from infrastructure.sandbox import SandboxConfig, create_sandbox
 
-from .types import DifferentialResult, IDifferentialFinder
+from ..types import DifferentialResult, IDifferentialFinder
 
 
 @dataclass

@@ -5,9 +5,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from coevolution.populations.differential.operators.llm_operator import (
+from coevolution.populations.differential.helpers.llm_service import (
     DifferentialInputOutput,
-    DifferentialLLMOperator,
+    DifferentialLLMService,
 )
 
 
@@ -49,11 +49,11 @@ def mock_composer() -> MagicMock:
 
 
 @pytest.fixture
-def diff_llm_operator(
+def diff_llm_service(
     mock_llm: MagicMock, mock_parser: MagicMock, mock_composer: MagicMock
-) -> DifferentialLLMOperator:
-    """Returns the DifferentialLLMOperator instance with mocked dependencies."""
-    return DifferentialLLMOperator(
+) -> DifferentialLLMService:
+    """Returns the DifferentialLLMService instance with mocked dependencies."""
+    return DifferentialLLMService(
         llm=mock_llm,
         parser=mock_parser,
         composer=mock_composer,
@@ -72,7 +72,7 @@ def sample_io_pairs() -> list[DifferentialInputOutput]:
 
 
 def test_get_test_method_from_io(
-    diff_llm_operator: DifferentialLLMOperator, monkeypatch: pytest.MonkeyPatch
+    diff_llm_service: DifferentialLLMService, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Verify generation of test methods from IO pairs."""
     starter_code = "class Solution:\n    def f(self, x):\n        return x"
@@ -82,9 +82,9 @@ def test_get_test_method_from_io(
         {"input_arg": {"x": 2}, "output": 2},
     ]
 
-    # This calls into PythonLanguage.compose_test_case internally in DifferentialLLMOperator.get_test_method_from_io
-    # Since DifferentialLLMOperator uses hardcoded PythonLanguage for tests, we can test it directly.
-    result = diff_llm_operator.get_test_method_from_io(
+    # This calls into PythonLanguage.compose_test_case internally in DifferentialLLMService.get_test_method_from_io
+    # Since DifferentialLLMService uses hardcoded PythonLanguage for tests, we can test it directly.
+    result = diff_llm_service.get_test_method_from_io(
         starter_code, cast(list[DifferentialInputOutput], sample_io_pairs), parent_ids, io_index=0
     )
 
@@ -94,7 +94,7 @@ def test_get_test_method_from_io(
 
 
 def test_get_test_method_from_io_standalone(
-    diff_llm_operator: DifferentialLLMOperator,
+    diff_llm_service: DifferentialLLMService,
     sample_io_pairs: list[DifferentialInputOutput],
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -102,7 +102,7 @@ def test_get_test_method_from_io_standalone(
     starter_code = "def f(x: int) -> int:\n    return x"
     parent_ids = ["S1", "S2"]
 
-    result = diff_llm_operator.get_test_method_from_io(
+    result = diff_llm_service.get_test_method_from_io(
         starter_code, sample_io_pairs, parent_ids, io_index=0
     )
 

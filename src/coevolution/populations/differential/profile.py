@@ -25,13 +25,13 @@ from infrastructure.llm_client import LLMClient
 from infrastructure.sandbox.types import SandboxConfig
 
 from ..registries import profile_registry
-from .finder import DifferentialFinder
+from .helpers.finder import DifferentialFinder
 # Operators/Initializers imported here to ensure decorators are run
 from .operators.discovery import DifferentialDiscoveryOperator  # noqa: F401
 # Initializers imported here to ensure decorators are run
 from .initializers import DifferentialInitializer  # noqa: F401
-from .operators.llm_operator import DifferentialLLMOperator
-from .selector import FunctionallyEqSelector
+from .helpers.llm_service import DifferentialLLMService
+from .helpers.selector import FunctionallyEqSelector
 
 
 @profile_registry.test_factory("differential")
@@ -84,7 +84,7 @@ def create_differential_test_profile(
         RouletteWheelParentSelection()
     )
 
-    llm_service = DifferentialLLMOperator(
+    llm_service = DifferentialLLMService(
         llm=llm_client,
         parser=language_adapter.parser,
         composer=language_adapter.composer,

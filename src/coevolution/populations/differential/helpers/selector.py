@@ -6,7 +6,7 @@ import numpy as np
 from loguru import logger
 
 from coevolution.core.interfaces import CoevolutionContext
-from .types import FunctionallyEquivGroup, IFunctionallyEquivalentCodeSelector
+from ..types import FunctionallyEquivGroup, IFunctionallyEquivalentCodeSelector
 
 
 class FunctionallyEqSelector(IFunctionallyEquivalentCodeSelector):

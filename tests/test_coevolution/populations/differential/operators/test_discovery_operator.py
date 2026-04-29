@@ -9,8 +9,8 @@ from coevolution.core.interfaces import CoevolutionContext, Problem
 from coevolution.core.population import CodePopulation
 from coevolution.populations.differential.operators.discovery import DifferentialDiscoveryOperator
 from coevolution.populations.differential.types import DifferentialResult, FunctionallyEquivGroup
-from coevolution.populations.differential.operators.llm_operator import (
-    DifferentialLLMOperator,
+from coevolution.populations.differential.helpers.llm_service import (
+    DifferentialLLMService,
 )
 
 @pytest.fixture
@@ -19,7 +19,7 @@ def discovery_operator() -> DifferentialDiscoveryOperator:
     parser = MagicMock()
     parent_selector = MagicMock()
     prob_assigner = MagicMock()
-    llm_service = MagicMock(spec=DifferentialLLMOperator)
+    llm_service = MagicMock(spec=DifferentialLLMService)
     differential_finder = MagicMock()
     func_eq_selector = MagicMock()
     

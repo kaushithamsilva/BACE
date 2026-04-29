@@ -26,7 +26,7 @@ from typing import Any
 from unittest.mock import MagicMock, patch
 
 from coevolution.core.interfaces.data import SandboxConfig
-from coevolution.populations.differential.finder import (
+from coevolution.populations.differential.helpers.finder import (
     DifferentialFinder,
     _SnippetResult,
 )
@@ -64,7 +64,7 @@ def _make_finder(local_sandbox: MagicMock) -> DifferentialFinder:
     runtime: MagicMock = MagicMock()
     runtime.get_execution_command.return_value = ["python", "eval_script.py"]
 
-    with patch("coevolution.populations.differential.finder.create_sandbox") as mock_create:
+    with patch("coevolution.populations.differential.helpers.finder.create_sandbox") as mock_create:
         # First call → _local_sandbox, second call → _python_sandbox
         mock_create.side_effect = [local_sandbox, MagicMock()]
         finder = DifferentialFinder(
@@ -237,7 +237,7 @@ class TestFindDifferential:
             json.dumps(inputs)
         )
 
-        with patch("coevolution.populations.differential.finder.create_sandbox") as mock_create:
+        with patch("coevolution.populations.differential.helpers.finder.create_sandbox") as mock_create:
             mock_create.side_effect = [local_sandbox, python_sandbox]
             finder = DifferentialFinder(
                 sandbox_config=_real_sandbox_config(),
@@ -322,7 +322,7 @@ class TestFindDifferential:
         runtime: MagicMock = MagicMock()
         runtime.get_execution_command.return_value = ["python", "x.py"]
 
-        with patch("coevolution.populations.differential.finder.create_sandbox") as mock_create:
+        with patch("coevolution.populations.differential.helpers.finder.create_sandbox") as mock_create:
             mock_create.return_value = local_sandbox
             finder = DifferentialFinder(
                 sandbox_config=_real_sandbox_config(),

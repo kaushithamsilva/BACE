@@ -24,10 +24,10 @@ from ..types import (
     IDifferentialFinder,
     IFunctionallyEquivalentCodeSelector,
 )
-from .llm_operator import (
+from ..helpers.llm_service import (
     DifferentialGenScriptInput,
     DifferentialInputOutput,
-    DifferentialLLMOperator,
+    DifferentialLLMService,
 )
 
 
@@ -63,7 +63,7 @@ class DifferentialDiscoveryOperator(BaseLLMOperator[TestIndividual]):
         language_name: str,
         parent_selector: IParentSelectionStrategy[TestIndividual],
         prob_assigner: IProbabilityAssigner,
-        llm_service: DifferentialLLMOperator,
+        llm_service: DifferentialLLMService,
         differential_finder: IDifferentialFinder,
         func_eq_selector: IFunctionallyEquivalentCodeSelector,
         divergence_limit: int = 5,

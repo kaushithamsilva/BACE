@@ -8,14 +8,14 @@ from .types import (
     DifferentialResult,
     IDifferentialFinder,
 )
-from .selector import FunctionallyEqSelector
-from .finder import DifferentialFinder
-from .operators import (
-    DifferentialLLMOperator,
+from .helpers.selector import FunctionallyEqSelector
+from .helpers.finder import DifferentialFinder
+from .helpers.llm_service import (
+    DifferentialLLMService,
     DifferentialGenScriptInput,
     DifferentialInputOutput,
-    DifferentialDiscoveryOperator,
 )
+from .operators.discovery import DifferentialDiscoveryOperator
 from .initializers import DifferentialInitializer
 
 __all__ = [
@@ -27,7 +27,7 @@ __all__ = [
     "IDifferentialFinder",
     "FunctionallyEqSelector",
     "DifferentialFinder",
-    "DifferentialLLMOperator",
+    "DifferentialLLMService",
     "DifferentialGenScriptInput",
     "DifferentialInputOutput",
     "DifferentialDiscoveryOperator",

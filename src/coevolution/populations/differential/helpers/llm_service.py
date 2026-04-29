@@ -44,7 +44,7 @@ class DifferentialGenScriptInput:
     num_inputs_to_generate: int = 100
 
 
-class DifferentialLLMOperator(BaseLLMService):
+class DifferentialLLMService(BaseLLMService):
     """LLM service for differential test generation.
 
     This is NOT an IOperator — it is an internal service used by
@@ -63,7 +63,7 @@ class DifferentialLLMOperator(BaseLLMService):
         # Input generator scripts are always Python regardless of main code language
         self.python_adapter = PythonLanguage()
         logger.debug(
-            f"DifferentialLLMOperator: code={language_name}, generator-script=Python"
+            f"DifferentialLLMService: code={language_name}, generator-script=Python"
         )
 
     def _extract_python_code_block(self, response: str) -> str:
@@ -130,5 +130,5 @@ class DifferentialLLMOperator(BaseLLMService):
 __all__ = [
     "DifferentialInputOutput",
     "DifferentialGenScriptInput",
-    "DifferentialLLMOperator",
+    "DifferentialLLMService",
 ]
