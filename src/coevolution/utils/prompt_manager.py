@@ -10,16 +10,18 @@ class PromptManager:
     """
 
     def __init__(
-        self, template_dir: Optional[str] = None, language: str = "python"
+        self, template_dirs: Optional[str | list[str]] = None, language: str = "python"
     ) -> None:
-        if template_dir is None:
+        if template_dirs is None:
             # Default to src/coevolution/prompts relative to this file
             base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            template_dir = os.path.join(base_dir, "prompts")
+            template_dirs = [os.path.join(base_dir, "prompts")]
+        elif isinstance(template_dirs, str):
+            template_dirs = [template_dirs]
 
         self.language = language
         self.env = Environment(
-            loader=FileSystemLoader(template_dir),
+            loader=FileSystemLoader(template_dirs),
             autoescape=select_autoescape(),
             trim_blocks=True,
             lstrip_blocks=True,
