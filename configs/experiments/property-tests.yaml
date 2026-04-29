@@ -28,9 +28,6 @@ logging:
   file_level: "DEBUG"
   log_file_base_name: "property_"
 
-rephraser:
-  enabled: false
-  n: 0
 
 code_profile_overrides:
   init_pop_batch_size: 1
