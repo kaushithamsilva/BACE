@@ -1,11 +1,10 @@
 """Property test population operators."""
 
-from .noop import NoOpOperator
-from .refiner import AdversarialPropertyRefiner
-from .code_repair import PropertyCodeRepairOperator
+import pkgutil
+import importlib
 
-__all__ = [
-    "NoOpOperator",
-    "AdversarialPropertyRefiner",
-    "PropertyCodeRepairOperator",
-]
+# Automatically discover and import all modules in this package.
+# This triggers the @operator_registry decorators for property operators.
+for loader, module_name, is_pkg in pkgutil.iter_modules(__path__):
+    importlib.import_module(f".{module_name}", __package__)
+

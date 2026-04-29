@@ -15,8 +15,6 @@ from .helpers.llm_service import (
     DifferentialGenScriptInput,
     DifferentialInputOutput,
 )
-from .operators.discovery import DifferentialDiscoveryOperator
-from .initializers import BootstrappedInitializer
 
 __all__ = [
     "create_differential_test_profile",
@@ -30,6 +28,5 @@ __all__ = [
     "DifferentialLLMService",
     "DifferentialGenScriptInput",
     "DifferentialInputOutput",
-    "DifferentialDiscoveryOperator",
-    "BootstrappedInitializer",
 ]
+
