@@ -81,7 +81,7 @@ EACH EPOCH — PropertyTestEvaluator.execute_tests(code_pop, property_test_pop)
 
 ## Key Components
 
-### 1. `IOPairCache` (types.py)
+### 1. `IOPairCache` (`types.py`)
 
 A central, thread-safe store responsible for:
 
@@ -89,7 +89,7 @@ A central, thread-safe store responsible for:
 - **Generated Inputs**: Cached list of raw input strings produced by the generator.
 - **Per-Code IOPairs**: A mapping of `code_id` to its actual `(input, output)` pairs.
 
-### 2. `PropertyTestInitializer` (operators/initializer.py)
+### 2. `PropertyTestInitializer` (`initializers/standard.py`)
 
 Initiates the population using a two-stage process:
 
@@ -99,7 +99,7 @@ Initiates the population using a two-stage process:
    - **Stage 2 (Implementation)**: Descriptions are converted into executable Python snippets in **parallel** using a thread pool (`convert_description_to_property.j2`).
 3. **Public IO Pruning**: Every candidate property test is immediately validated against known-correct public test cases. If it returns `False` or crashes on any public IO, it is discarded.
 
-### 3. `PropertyTestEvaluator` (evaluator.py)
+### 3. `PropertyTestEvaluator` (`helpers/evaluator.py`)
 
 Implements the `IExecutionSystem` interface through a three-phase loop:
 
@@ -110,11 +110,15 @@ Implements the `IExecutionSystem` interface through a three-phase loop:
 ## Directory Structure
 
 - **types.py**: Core data structures (`IOPair`, `IOPairCache`).
-- **evaluator.py**: The `PropertyTestEvaluator` implementation and multiprocessing workers.
-- **profile.py**: Factory for creating the `TestProfile` and wiring dependencies.
-- **operators/**:
-  - **initializer.py**: The two-stage, thread-parallel initializer.
+- **helpers/**:
+  - **evaluator.py**: The `PropertyTestEvaluator` implementation and multiprocessing workers.
+  - **operator_utils.py**: Utility functions for property test scripts.
   - **validator.py**: Shared logic for pruning snippets against public test cases.
+- **profile.py**: Factory for creating the `TestProfile` and wiring dependencies.
+- **initializers/**:
+  - **standard.py**: The two-stage, thread-parallel initializer.
+- **operators/**:
+  - **refiner.py**: Adversarial refiner that evolves property tests.
   - **noop.py**: A no-op operator used when offspring generation is disabled.
 
 ## Logic Details

@@ -20,15 +20,15 @@ graph TD
 
 ### Phase 1: Candidate Selection
 
-The `FunctionallyEqSelector` (selector.py) analyzes the current observation matrix to find groups of code individuals that behave identically across all currently known tests. It selects unexplored pairs from these groups as candidates for differential testing.
+The `FunctionallyEqSelector` (`helpers/selector.py`) analyzes the current observation matrix to find groups of code individuals that behave identically across all currently known tests. It selects unexplored pairs from these groups as candidates for differential testing.
 
 ### Phase 2: Script Generation
 
-For each selected pair, the `DifferentialLLMOperator` (operators/llm_operator.py) prompts an LLM to generate a Python script (`gen_inputs`). This script is designed to produce a diverse set of inputs (typical cases, edge cases, boundaries) specifically tailored to the problem description and the provided code.
+For each selected pair, the `DifferentialLLMService` (`helpers/llm_service.py`) prompts an LLM to generate a Python script (`gen_inputs`). This script is designed to produce a diverse set of inputs (typical cases, edge cases, boundaries) specifically tailored to the problem description and the provided code.
 
 ### Phase 3: Divergence Finding
 
-The `DifferentialFinder` (finder.py) executes the two candidate code snippets against the generated inputs in parallel sandboxes.
+The `DifferentialFinder` (`helpers/finder.py`) executes the two candidate code snippets against the generated inputs in parallel sandboxes.
 
 - If their outputs differ for a given input, a **divergence** is found.
 - Each divergence results in two competing hypotheses: Code A is correct, or Code B is correct.
@@ -36,11 +36,11 @@ The `DifferentialFinder` (finder.py) executes the two candidate code snippets ag
 
 ## Key Components
 
-### 1. `DifferentialDiscoveryOperator` (operators/discovery.py)
+### 1. `DifferentialDiscoveryOperator` (`operators/discovery.py`)
 
 The primary orchestrator that manages the transition between phases, maintains an `explored_pairs_cache` to avoid redundant work, and converts raw divergences into `TestIndividual` objects.
 
-### 2. `DifferentialFinder` (finder.py)
+### 2. `DifferentialFinder` (`helpers/finder.py`)
 
 The low-level execution engine that:
 
@@ -48,19 +48,20 @@ The low-level execution engine that:
 - Parallelizes the execution of code individuals in the target language sandbox using CPU workers.
 - Identifies and packages output discrepancies as `DifferentialResult` objects.
 
-### 3. `FunctionallyEqSelector` (selector.py)
+### 3. `FunctionallyEqSelector` (`helpers/selector.py`)
 
 Implements grouping logic to identify code individuals that currently "look" functionally equivalent based on their test pass/fail signatures.
 
 ## Directory Structure
 
 - **types.py**: Core data structures (`DifferentialResult`, `FunctionallyEquivGroup`).
-- **finder.py**: Multi-process engine for finding output discrepancies.
-- **selector.py**: Logic for grouping code individuals by behavior.
+- **helpers/**:
+  - **llm_service.py**: LLM services for generating input scripts and converting divergences to unit tests.
+  - **finder.py**: Multi-process engine for finding output discrepancies.
+  - **selector.py**: Logic for grouping code individuals by behavior.
 - **profile.py**: Factory for creating the `TestProfile` and wiring the discovery pipeline.
 - **operators/**:
   - **discovery.py**: The 3-phase pipeline orchestrator.
-  - **llm_operator.py**: LLM services for generating input scripts and converting divergences to unit tests.
   - **initializer.py**: Basic initializer (often starts empty as discovery is dynamic).
 
 ## Logic Details

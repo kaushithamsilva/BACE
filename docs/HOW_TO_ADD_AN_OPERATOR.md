@@ -16,6 +16,9 @@ Create your new operator inside `src/coevolution/populations/<name>/operators/<n
 
 It should inherit from `BaseLLMOperator` (for LLM-based operators) or implement the `IOperator` protocol.
 
+> [!TIP]
+> If your operator shares complex logic with other components (like LLM-specific extraction or validation), place that logic in a dedicated `helpers/` folder within the population directory. This keeps the `operators/` folder clean and strictly limited to registered strategies.
+
 ```python
 # src/coevolution/populations/code/operators/semantic.py
 from coevolution.strategies.llm_base import BaseLLMOperator, LLMGenerationError, llm_retry

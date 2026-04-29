@@ -12,12 +12,14 @@ Every population follows this structure:
 populations/<name>/
 ├── __init__.py          # re-exports factory
 ├── profile.py           # factory function: create_<name>_profile(...)
+├── helpers/             # internal supporting logic (services, evaluators, mixins)
+│   ├── __init__.py      # optional: re-exports internal logic
+│   └── llm_helpers.py   # common: public LLM utility mixin/service
 ├── initializers/        # dedicated folder for initializers
 │   ├── __init__.py      # re-exports all initializers
 │   └── standard.py      # <Name>Initializer
-└── operators/
+└── operators/           # registered evolutionary strategies only
     ├── __init__.py      # re-exports all operators
-    ├── _helpers.py      # optional: private LLM utility mixin
     ├── mutation.py      # optional: <Name>MutationOperator
     ├── crossover.py     # optional: <Name>CrossoverOperator
     └── edit.py          # optional: <Name>EditOperator

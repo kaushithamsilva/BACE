@@ -22,7 +22,7 @@ graph TD
 
 ## Key Components
 
-### 1. `UnittestInitializer` (operators/initializer.py)
+### 1. `UnittestInitializer` (`initializers/standard.py`)
 
 Creates Gen-0 test individuals via LLM.
 
@@ -30,13 +30,13 @@ Creates Gen-0 test individuals via LLM.
 - **Graceful Recovery**: Automatically handles under-generation by making additional "top-up" LLM calls and trims over-generation to match the exact `initial_population_size`.
 - **Parsing**: Extracts test functions from code blocks and ensures they are syntactically valid.
 
-### 2. Evolutionary Operators (operators/)
+### 2. Evolutionary Operators (`operators/`)
 
-The population size is maintained through three primary operators:
+The population size is maintained through primary operators:
 
 - **Mutation (`mutation.py`)**: Perturbs a single test function to explore new boundary conditions or logic paths.
 - **Crossover (`crossover.py`)**: Combines logic from two parent test functions to create a new offspring.
-- **Edit (`edit.py`)**: Performs more structural modifications or refinements to an existing test function.
+- **Repair (`repair.py`)**: Improves a test's discriminating power using code context.
 
 ### 3. Selection Strategy
 
@@ -45,10 +45,12 @@ The population size is maintained through three primary operators:
 ## Directory Structure
 
 - **profile.py**: Factory for creating the `TestProfile`, wiring the `Breeder`, `Initializer`, and `EliteSelector`.
+- **helpers/**:
+  - **llm_helpers.py**: Shared utilities for test extraction and LLM interaction.
+- **initializers/**:
+  - **standard.py**: LLM-based population initialization.
 - **operators/**:
-  - **initializer.py**: LLM-based population initialization.
-  - **mutation.py**, **crossover.py**, **edit.py**: Evolutionary operators.
-  - **_helpers.py**: Shared utilities for test extraction and LLM interaction.
+  - **mutation.py**, **crossover.py**, **repair.py**: Evolutionary operators.
 
 ## Logic Details
 
