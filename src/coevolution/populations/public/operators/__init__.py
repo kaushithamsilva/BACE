@@ -1,5 +1,9 @@
 """Public population operators."""
 
-from . import code_repair
+import pkgutil
+import importlib
 
-__all__ = ["code_repair"]
+# Automatically discover and import all modules in this package.
+# This triggers the @operator_registry decorators for public operators.
+for loader, module_name, is_pkg in pkgutil.iter_modules(__path__):
+    importlib.import_module(f".{module_name}", __package__)
