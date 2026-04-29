@@ -13,7 +13,7 @@ op_rates:
 
 # Initializer rates (must sum to 1.0)
 init_rates:
-  differential: 1.0
+  bootstrapped: 1.0
 
 # Bayesian reliability parameters
 alpha: 0.1  # P(pass | code correct, test incorrect)

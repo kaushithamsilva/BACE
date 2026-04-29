@@ -43,6 +43,9 @@ class AgentCoderInitializer(BaseLLMInitializer[CodeIndividual]):
         super().__init__(llm, parser, language_name)
         self._edit_operator = edit_operator
 
+    def initializer_name(self) -> str:
+        return "agent_coder"
+
     def initialize(self, problem: Problem, size: int | None = None) -> list[CodeIndividual]:
         if size is not None and size != 1:
              raise ValueError("AgentCoder initializer only supports size=1 per session.")
@@ -91,6 +94,7 @@ class AgentCoderInitializer(BaseLLMInitializer[CodeIndividual]):
             creation_op=OPERATION_INITIAL,
             generation_born=0,
             explanation=self.parser.get_docstring(code),
+            metadata={"initializer": self.initializer_name()},
         )
 
 

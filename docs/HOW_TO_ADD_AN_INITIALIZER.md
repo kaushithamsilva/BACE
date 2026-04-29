@@ -23,9 +23,12 @@ from coevolution.populations.registries import initializer_registry
 
 @initializer_registry.register("zero_shot", population="code")
 class ZeroShotCodeInitializer(CodeLLMHelpers, BaseLLMInitializer[CodeIndividual]):
+    def initializer_name(self) -> str:
+        return "zero_shot"
+
     def initialize(self, problem: Problem, size: int | None = None) -> list[CodeIndividual]:
         # Your logic here...
-        # Note: Use threads internally for parallel LLM calls
+        # Note: All orchestrations like parallelism are handled by WeightedPopulationInitializer.
         return []
 ```
 

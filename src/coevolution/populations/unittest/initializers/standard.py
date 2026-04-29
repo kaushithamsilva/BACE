@@ -46,6 +46,9 @@ class UnittestInitializer(UnittestLLMHelpers, BaseLLMInitializer[TestIndividual]
     def yields_per_call(self) -> int:
         return self._yields_per_call
 
+    def initializer_name(self) -> str:
+        return "unittest"
+
     def initialize(self, problem: Problem, size: int | None = None) -> list[TestIndividual]:
         if size is None:
             size = self._yields_per_call
@@ -60,7 +63,7 @@ class UnittestInitializer(UnittestLLMHelpers, BaseLLMInitializer[TestIndividual]
                     creation_op=OPERATION_INITIAL,
                     generation_born=0,
                     explanation=self.parser.get_docstring(fn),
-                    metadata={"initializer": self.__class__.__name__},
+                    metadata={"initializer": self.initializer_name()},
                 )
             )
         return individuals
