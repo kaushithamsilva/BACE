@@ -6,20 +6,20 @@ and the `BaseLLMService` class which handles LLM orchestration.
 Prompt Management:
     Templates are loaded from multiple directories in the following order:
 
-    1. The 'prompts/' folder where the operator's code is defined.
+    1. Local (Priority): The 'prompts/' folder where the operator's code is defined.
        (e.g. 'unittest/prompts/' for unittest-based operators).
 
-    2. The 'prompts/' folder of the population being modified.
-       (e.g. 'code/prompts/' when repairing code).
-       This is explicitly defined for specialized repair operators which some test populations may bring in.
+    2. Code Population (Secondary): The 'populations/code/prompts/' folder.
+       This allows specialized repair operators in other populations to
+       automatically use generic code templates.
 
-    3. The global 'src/coevolution/prompts/' folder for shared snippets.
+    3. Global (Fallback): The shared 'src/coevolution/prompts/' folder.
 """
 
 import inspect
 import os
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Optional, Protocol, Tuple, Type
+from typing import Any, Callable, Protocol, Tuple, Type
 
 from loguru import logger
 from tenacity import (
@@ -81,47 +81,43 @@ class BaseLLMService:
         llm: ILanguageModel,
         parser: ICodeParser,
         language_name: str,
-        population_name: Optional[str] = None,
     ) -> None:
         self._llm = llm
         self.parser = parser
         self.language_name = language_name
-        self.population_name = population_name
 
         # Resolve prioritized template search paths
-        template_dirs = self._resolve_template_dirs(population_name)
+        template_dirs = self._resolve_template_dirs()
         self.prompt_manager = PromptManager(
             template_dirs=template_dirs, language=language_name
         )
 
         logger.debug(
-            f"Initialized {self.__class__.__name__} for pop={population_name} "
+            f"Initialized {self.__class__.__name__} "
             f"with search paths: {[os.path.basename(os.path.dirname(p)) for p in template_dirs]}"
         )
 
-    def _resolve_template_dirs(self, target_pop: Optional[str]) -> list[str]:
+    def _resolve_template_dirs(self) -> list[str]:
         """Resolves the prioritized search paths for Jinja2 templates."""
         # src/coevolution/strategies/llm_base.py -> src/coevolution/
         base_src = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         dirs = []
 
-        # 1. Home population prompts (where the class is physically defined)
-        # Highest priority for specialized operators
+        # 1. Local Prompts (where the class is physically defined)
         try:
             class_file = inspect.getfile(self.__class__)
             # populations/<pop_name>/operators/file.py -> populations/<pop_name>/
             pop_root = os.path.dirname(os.path.dirname(class_file))
-            home_prompts = os.path.join(pop_root, "prompts")
-            if os.path.isdir(home_prompts):
-                dirs.append(home_prompts)
+            local_prompts = os.path.join(pop_root, "prompts")
+            if os.path.isdir(local_prompts):
+                dirs.append(local_prompts)
         except (TypeError, ValueError):
             pass
 
-        # 2. Target population prompts (the population the operator is acting on)
-        if target_pop:
-            target_path = os.path.join(base_src, "populations", target_pop, "prompts")
-            if os.path.isdir(target_path):
-                dirs.append(target_path)
+        # 2. Code Population Prompts (Primary fallback for all populations)
+        code_path = os.path.join(base_src, "populations", "code", "prompts")
+        if os.path.isdir(code_path):
+            dirs.append(code_path)
 
         # 3. Global Prompts
         global_prompts = os.path.join(base_src, "prompts")
@@ -205,9 +201,8 @@ class BaseLLMOperator[T: BaseIndividual](BaseLLMService, IOperator[T], ABC):
         language_name: str,
         parent_selector: IParentSelectionStrategy[T],
         prob_assigner: IProbabilityAssigner,
-        population_name: Optional[str] = None,
     ) -> None:
-        super().__init__(llm, parser, language_name, population_name=population_name)
+        super().__init__(llm, parser, language_name)
         self.parent_selector = parent_selector
         self.prob_assigner = prob_assigner
 
@@ -237,9 +232,8 @@ class BaseLLMInitializer[T: BaseIndividual](
         llm: ILanguageModel,
         parser: ICodeParser,
         language_name: str,
-        population_name: Optional[str] = None,
     ) -> None:
-        super().__init__(llm, parser, language_name, population_name=population_name)
+        super().__init__(llm, parser, language_name)
 
     @abstractmethod
     def initialize(self, problem: Problem, size: int | None = None) -> list[T]: ...
