@@ -29,7 +29,7 @@ class DirectCodeInitializer(_CodeLLMHelpers, BaseLLMInitializer[CodeIndividual])
         # This initializer produces individuals one-at-a-time. Parallelism 
         # is managed by the WeightedPopulationInitializer orchestrator.
         prompt = self.prompt_manager.render_prompt(
-            "operators/code/initial_single.j2",
+            "initialization/initial_single.j2",
             question_content=problem.question_content,
             starter_code=problem.starter_code,
         )

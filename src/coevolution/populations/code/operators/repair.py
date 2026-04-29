@@ -98,7 +98,7 @@ class CodeGenericRepairOperator(_CodeLLMHelpers, BaseLLMOperator[CodeIndividual]
             failing_tests_data.append({"snippet": test_ind.snippet, "trace": trace})
 
         prompt = self.prompt_manager.render_prompt(
-            "operators/code/edit.j2",
+            "repair/edit.j2",
             question_content=problem.question_content,
             starter_code=problem.starter_code,
             individual=parent.snippet,

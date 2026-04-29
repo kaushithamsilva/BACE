@@ -102,7 +102,7 @@ class AgentCoderRepairOperator(BaseLLMOperator[CodeIndividual]):
             f"Test Case:\n{test}\n\nError Trace:\n{trace}" for test, trace in failing
         )
         prompt = self.prompt_manager.render_prompt(
-            "operators/agent_coder/edit.j2",
+            "repair/edit.j2",
             question_content=problem.question_content,
             starter_code=problem.starter_code,
             feedback=feedback,

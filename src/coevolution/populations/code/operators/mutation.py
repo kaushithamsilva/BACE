@@ -49,7 +49,7 @@ class CodeMutationOperator(_CodeLLMHelpers, BaseLLMOperator[CodeIndividual]):
         parent = parents[0]
 
         prompt = self.prompt_manager.render_prompt(
-            "operators/code/mutate.j2",
+            "mutation/mutate.j2",
             question_content=problem.question_content,
             individual=parent.snippet,
             starter_code=problem.starter_code,

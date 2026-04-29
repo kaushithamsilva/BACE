@@ -47,7 +47,7 @@ class UnittestCrossoverOperator(_TestLLMHelpers, BaseLLMOperator[TestIndividual]
         p1, p2 = parents[0], parents[1]
 
         prompt = self.prompt_manager.render_prompt(
-            "operators/unittest/crossover.j2",
+            "crossover/crossover.j2",
             question_content=context.problem.question_content,
             parent1=p1.snippet,
             parent2=p2.snippet,

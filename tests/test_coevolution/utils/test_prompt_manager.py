@@ -10,7 +10,7 @@ def test_prompt_manager_render(tmp_path: Path) -> None:
     template_file = template_dir / "test.j2"
     template_file.write_text("Hello {{ name }}!")
 
-    manager = PromptManager(template_dir=str(template_dir))
+    manager = PromptManager(template_dirs=str(template_dir))
     result = manager.render_prompt("test.j2", name="World")
     assert result == "Hello World!"
 
@@ -27,6 +27,6 @@ def test_prompt_manager_include(tmp_path: Path) -> None:
     child_file = template_dir / "child.j2"
     child_file.write_text("{% import 'common/base.j2' as base %}{{ base.greet(name) }}")
 
-    manager = PromptManager(template_dir=str(template_dir))
+    manager = PromptManager(template_dirs=str(template_dir))
     result = manager.render_prompt("child.j2", name="Jinja")
     assert result == "Hello Jinja!"

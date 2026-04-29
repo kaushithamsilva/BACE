@@ -76,7 +76,7 @@ class UnittestInitializer(_TestLLMHelpers, BaseLLMInitializer[TestIndividual]):
     )
     def _generate_test_functions(self, problem: Problem, target: int) -> list[str]:
         prompt = self.prompt_manager.render_prompt(
-            "operators/unittest/initial.j2",
+            "initialization/initial.j2",
             population_size=target,
             question_content=problem.question_content,
             starter_code=problem.starter_code,
@@ -97,7 +97,7 @@ class UnittestInitializer(_TestLLMHelpers, BaseLLMInitializer[TestIndividual]):
         if len(test_functions) < target:
             additional = target - len(test_functions)
             extra_prompt = self.prompt_manager.render_prompt(
-                "operators/unittest/initial.j2",
+                "initialization/initial.j2",
                 population_size=additional,
                 question_content=problem.question_content,
                 starter_code=problem.starter_code,

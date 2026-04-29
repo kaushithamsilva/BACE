@@ -47,7 +47,7 @@ class UnittestMutationOperator(_TestLLMHelpers, BaseLLMOperator[TestIndividual])
         parent = parents[0]
 
         prompt = self.prompt_manager.render_prompt(
-            "operators/unittest/mutate.j2",
+            "mutation/mutate.j2",
             question_content=context.problem.question_content,
             individual=parent.snippet,
         )

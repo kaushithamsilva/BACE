@@ -60,7 +60,7 @@ class AgentCoderInitializer(BaseLLMInitializer[CodeIndividual]):
     )
     def _generate_initial(self, problem: Problem) -> CodeIndividual:
         prompt = self.prompt_manager.render_prompt(
-            "operators/agent_coder/init.j2",
+            "initialization/init.j2",
             question_content=problem.question_content,
             starter_code=problem.starter_code,
         )

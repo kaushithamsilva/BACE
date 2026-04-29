@@ -85,7 +85,7 @@ class DifferentialLLMOperator(BaseLLMService):
             f"Generating differential script for {len(dto.passing_test_cases)} existing tests"
         )
         prompt = self.prompt_manager.render_prompt(
-            "operators/differential/gen_script.j2",
+            "initialization/gen_script.j2",
             question_content=dto.question_content,
             code_snippet_P=dto.equivalent_code_snippet_1,
             code_snippet_Q=dto.equivalent_code_snippet_2,

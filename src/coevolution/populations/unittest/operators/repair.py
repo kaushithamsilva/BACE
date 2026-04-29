@@ -93,7 +93,7 @@ class UnittestRepairOperator(_TestLLMHelpers, BaseLLMOperator[TestIndividual]):
         if passing_inds and failing_inds:
             edit_type = "discriminating"
             prompt = self.prompt_manager.render_prompt(
-                "operators/unittest/edit_discriminating.j2",
+                "repair/edit_discriminating.j2",
                 question_content=context.problem.question_content,
                 current_test_snippet=parent.snippet,
                 passing_code_snippet=passing_inds[0].snippet,
@@ -106,7 +106,7 @@ class UnittestRepairOperator(_TestLLMHelpers, BaseLLMOperator[TestIndividual]):
                 logger.debug("Not enough failing inds for all-failing edit")
                 return []
             prompt = self.prompt_manager.render_prompt(
-                "operators/unittest/edit_all_failing.j2",
+                "repair/edit_all_failing.j2",
                 question_content=context.problem.question_content,
                 current_test_snippet=parent.snippet,
                 failing_code_snippet_P=failing_inds[0].snippet,
@@ -120,7 +120,7 @@ class UnittestRepairOperator(_TestLLMHelpers, BaseLLMOperator[TestIndividual]):
                 logger.debug("Not enough passing inds for all-passing edit")
                 return []
             prompt = self.prompt_manager.render_prompt(
-                "operators/unittest/edit_all_passing.j2",
+                "repair/edit_all_passing.j2",
                 question_content=context.problem.question_content,
                 current_test_snippet=parent.snippet,
                 passing_code_snippet_P=passing_inds[0].snippet,

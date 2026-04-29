@@ -172,7 +172,7 @@ class AdversarialPropertyRefiner(BaseLLMOperator[TestIndividual]):
             problem.public_test_cases, problem.starter_code, self.parser
         )
         prompt = self.prompt_manager.render_prompt(
-            "operators/property/gen_counter_example.j2",
+            "repair/gen_counter_example.j2",
             question_content=problem.question_content,
             starter_code=problem.starter_code,
             snippet=parent.snippet,
@@ -241,7 +241,7 @@ class AdversarialPropertyRefiner(BaseLLMOperator[TestIndividual]):
             problem.public_test_cases, problem.starter_code, self.parser
         )
         prompt = self.prompt_manager.render_prompt(
-            "operators/property/refine_property.j2",
+            "mutation/refine_property.j2",
             question_content=problem.question_content,
             starter_code=problem.starter_code,
             snippet=parent.snippet,

@@ -106,7 +106,7 @@ class PropertyTestInitializer(BaseLLMInitializer[TestIndividual]):
             problem.public_test_cases, problem.starter_code, self.parser
         )
         prompt = self.prompt_manager.render_prompt(
-            "operators/property/gen_inputs.j2",
+            "initialization/gen_inputs.j2",
             question_content=problem.question_content,
             starter_code=problem.starter_code,
             public_tests=public_tests,
@@ -216,7 +216,7 @@ class PropertyTestInitializer(BaseLLMInitializer[TestIndividual]):
             problem.public_test_cases, problem.starter_code, self.parser
         )
         prompt = self.prompt_manager.render_prompt(
-            "operators/property/describe_properties.j2",
+            "initialization/describe_properties.j2",
             question_content=problem.question_content,
             starter_code=problem.starter_code,
             public_tests=public_tests,
@@ -238,7 +238,7 @@ class PropertyTestInitializer(BaseLLMInitializer[TestIndividual]):
             problem.public_test_cases, problem.starter_code, self.parser
         )
         prompt = self.prompt_manager.render_prompt(
-            "operators/property/convert_description_to_property.j2",
+            "initialization/convert_description_to_property.j2",
             description=description,
             question_content=problem.question_content,
             starter_code=problem.starter_code,

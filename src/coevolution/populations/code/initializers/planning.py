@@ -28,7 +28,7 @@ class PlanningCodeInitializer(_CodeLLMHelpers, BaseLLMInitializer[CodeIndividual
     def initialize(self, problem: Problem, size: int | None = None) -> list[CodeIndividual]:
         # Step 1: Generate Plan
         plan_prompt = self.prompt_manager.render_prompt(
-            "operators/code/plan_generate.j2",
+            "initialization/plan_generate.j2",
             question_content=problem.question_content,
             starter_code=problem.starter_code,
         )
@@ -36,7 +36,7 @@ class PlanningCodeInitializer(_CodeLLMHelpers, BaseLLMInitializer[CodeIndividual
         
         # Step 2: Generate Code from Plan
         code_prompt = self.prompt_manager.render_prompt(
-            "operators/code/plan_to_code.j2",
+            "initialization/plan_to_code.j2",
             question_content=problem.question_content,
             starter_code=problem.starter_code,
             plan=plan

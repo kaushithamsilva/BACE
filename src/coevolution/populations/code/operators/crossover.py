@@ -47,7 +47,7 @@ class CodeCrossoverOperator(_CodeLLMHelpers, BaseLLMOperator[CodeIndividual]):
         p1, p2 = parents[0], parents[1]
 
         prompt = self.prompt_manager.render_prompt(
-            "operators/code/crossover.j2",
+            "crossover/crossover.j2",
             question_content=problem.question_content,
             parent1=p1.snippet,
             parent2=p2.snippet,
