@@ -98,13 +98,9 @@ def create_<name>_profile(llm_client, language_adapter, **factory_config) -> Cod
     )
 ```
 
-### 4. Wire everything up
+### 5. Automatic Registration
 
-Ensure all operator files are imported in `operators/__init__.py` and all initializers in `initializers/__init__.py` so their decorators run. Re-export the factory in the main population `__init__.py`.
-
-### 5. Register in Global Populations
-
-Add `from . import <name>` to `src/coevolution/populations/__init__.py`.
+Populations are automatically discovered and imported by `src/coevolution/populations/__init__.py`. You do **not** need to manually add your new package to the central `__init__.py`
 
 ---
 
@@ -114,7 +110,6 @@ Add `from . import <name>` to `src/coevolution/populations/__init__.py`.
 - [ ] Initializer/Operators implement their logic and use `@*_registry.register`
 - [ ] `initializers/__init__.py` and `operators/__init__.py` import all implementations
 - [ ] `profile.py` uses registries to build `initializer` and `breeder`
-- [ ] `src/coevolution/populations/__init__.py` imports the new package
 - [ ] Config rates (e.g. `standard_init_rate: 1.0`, `mutation_rate: 1.0`) added to experiment YAML.
 
 > [!NOTE]

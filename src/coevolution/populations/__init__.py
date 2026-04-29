@@ -1,11 +1,12 @@
-"""Populations package — one subpackage per population type.
-
-Adding a new population:
-1. Create populations/<name>/ with operators/ and profile.py
-2. Import the factory in factories/__init__.py
-"""
-
-from . import agent_coder, code, differential, property, public, unittest
+import pkgutil
+import importlib
 from .registries import profile_registry
 
-__all__ = ["code", "unittest", "differential", "agent_coder", "property", "public", "profile_registry"]
+# Automatically discover and import all population packages in this directory.
+# This triggers the @register decorators in each population's profile.py.
+for loader, module_name, is_pkg in pkgutil.iter_modules(__path__):
+    if is_pkg and module_name != "registries":
+        importlib.import_module(f".{module_name}", __package__)
+
+__all__ = ["profile_registry"]
+
