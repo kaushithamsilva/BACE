@@ -5,8 +5,10 @@ This guide explains how to add a new evolutionary operator (e.g., a new heuristi
 The process is "zero-friction" and requires only three steps:
 
 1. Implement the class and tag with `@operator_registry.register`.
-2. Export it in the package `__init__.py`.
-3. Assign the weight in your YAML configuration.
+2. Assign the weight in your YAML configuration.
+
+> [!NOTE]
+> The system uses automatic module discovery. You **do not** need to manually import your new operator in `__init__.py`. As long as your file is inside the `operators/` directory and contains the `@register` decorator at the class level, it will be automatically discovered at runtime.
 
 ---
 
@@ -71,18 +73,9 @@ def __init__(
     self.k_failing_tests = k_failing_tests
 ```
 
-## 2. Export It (1 line)
+## 2. Automatic Discovery
 
-Make the operator available so the decorator runs during system initialization. Add it to `src/coevolution/populations/<name>/operators/__init__.py`:
-
-```python
-from .semantic import SemanticHeuristicOperator
-
-__all__ = [
-    # ...
-    "SemanticHeuristicOperator",
-]
-```
+The system automatically discovers all operators in the `operators/` directory. There is **no need** to manually import or export your new operator in `src/coevolution/populations/<name>/operators/__init__.py`.
 
 ## 3. Update the YAML Config
 
@@ -114,7 +107,6 @@ When the `PopulationDiscoveryService` builds the `code` population, it automatic
 ## Summary Checklist
 
 - [ ] Operator class implemented and decorated with `@operator_registry.register`.
-- [ ] Class imported in `operators/__init__.py`.
 - [ ] Rate assigned in `.yaml` config (e.g., `semantic_mutation_rate: 0.2`).
 - [ ] Total rates in YAML sum to 1.0.
 

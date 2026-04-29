@@ -7,6 +7,9 @@ The process is "zero-friction" and requires only two steps:
 1. Implement the class and tag with `@initializer_registry.register`.
 2. Assign the weight in your YAML configuration.
 
+> [!NOTE]
+> The system uses automatic module discovery. You **do not** need to manually import your new initializer in `__init__.py`. As long as your file is inside the `initializers/` directory and contains the `@register` decorator at the class level, it will be automatically discovered at runtime.
+
 ---
 
 ## 1. Write the implementation
@@ -43,18 +46,9 @@ The registry uses `inspect` to automatically inject dependencies into your const
 - `sandbox_config`: (If applicable) The sandbox configuration.
 - Any other parameter passed to `build_weighted_initializer` in the profile factory.
 
-## 2. Export It (1 line)
+## 2. Automatic Discovery
 
-Make the initializer available so the decorator runs by exporting it in `src/coevolution/populations/<name>/initializers/__init__.py`:
-
-```python
-from .zero_shot import ZeroShotCodeInitializer
-
-__all__ = [
-    # ...
-    "ZeroShotCodeInitializer",
-]
-```
+The system automatically discovers all initializers in the `initializers/` directory. There is **no need** to manually import or export your new initializer in `src/coevolution/populations/<name>/initializers/__init__.py`.
 
 ## 3. Update the YAML Config
 
@@ -79,7 +73,6 @@ code_profile:
 ## Summary Checklist
 
 - [ ] Initializer class implemented and decorated with `@initializer_registry.register`.
-- [ ] Class imported in `initializers/__init__.py`.
 - [ ] Weight assigned in `.yaml` config (e.g., `my_new_init_rate: 1.0`).
 
 > [!NOTE]
