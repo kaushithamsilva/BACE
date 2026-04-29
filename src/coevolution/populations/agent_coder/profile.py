@@ -24,12 +24,9 @@ from coevolution.strategies.selection.parent_selection import (
     RouletteWheelParentSelection,
 )
 
-# Operators/Initializers imported here to ensure decorators are run
-from .operators.repair import AgentCoderRepairOperator  # noqa: F401
-from .initializers import AgentCoderInitializer  # noqa: F401
-
-
 from ..registries import profile_registry
+# Ensure decorators are run by importing the packages
+from . import initializers, operators  # noqa: F401
 
 
 @profile_registry.code_factory("agent_coder")

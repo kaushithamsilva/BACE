@@ -26,12 +26,8 @@ from coevolution.strategies.selection.parent_selection import (
 from infrastructure.llm_client import LLMClient
 
 from ..registries import profile_registry
-from .initializers import DirectCodeInitializer  # noqa: F401
-from .operators.crossover import CodeCrossoverOperator  # noqa: F401
-from .operators.repair import CodeGenericRepairOperator  # noqa: F401
-
-# Operators/Initializers imported here to ensure decorators are run
-from .operators.mutation import CodeMutationOperator  # noqa: F401
+# Ensure decorators are run by importing the packages
+from . import initializers, operators  # noqa: F401
 
 
 @profile_registry.code_factory("default")

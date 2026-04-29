@@ -24,11 +24,8 @@ from coevolution.strategies.selection.parent_selection import (
 from infrastructure.llm_client import LLMClient
 
 from ..registries import profile_registry
-# Operators/Initializers imported here to ensure decorators are run
-from .operators.crossover import UnittestCrossoverOperator  # noqa: F401
-from .operators.repair import UnittestRepairOperator  # noqa: F401
-from .initializers import UnittestInitializer  # noqa: F401
-from .operators.mutation import UnittestMutationOperator  # noqa: F401
+# Ensure decorators are run by importing the packages
+from . import initializers, operators  # noqa: F401
 
 
 @profile_registry.test_factory("unittest")

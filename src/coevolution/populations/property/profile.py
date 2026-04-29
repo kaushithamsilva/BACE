@@ -27,11 +27,9 @@ from infrastructure.sandbox import SandboxConfig
 
 from ..registries import profile_registry
 from .helpers.evaluator import PropertyTestEvaluator
-# Operators/Initializers imported here to ensure decorators are run
-from .operators import AdversarialPropertyRefiner  # noqa: F401
-from .initializers import PropertyTestInitializer  # noqa: F401
-from .operators.noop import NoOpOperator  # noqa: F401
 from .types import IOPairCache
+# Ensure decorators are run by importing the packages
+from . import initializers, operators  # noqa: F401
 
 
 @profile_registry.test_factory("property")

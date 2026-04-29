@@ -13,16 +13,16 @@ The process is "zero-friction" and requires only two steps:
 
 Create your new initializer inside `src/coevolution/populations/<name>/initializers/<new_initializer>.py`.
 
-For code populations, inherit from `_CodeLLMHelpers` (for utility methods) and `BaseLLMInitializer[CodeIndividual]`. For other populations, inherit from `BaseLLMInitializer[T]`.
+For code populations, inherit from `CodeLLMHelpers` (for utility methods) and `BaseLLMInitializer[CodeIndividual]`. For other populations, inherit from `BaseLLMInitializer[T]`.
 
 ```python
 # src/coevolution/populations/code/initializers/zero_shot.py
-from coevolution.populations.code.operators._helpers import _CodeLLMHelpers
+from coevolution.populations.code.helpers.llm_helpers import CodeLLMHelpers
 from coevolution.strategies.llm_base import BaseLLMInitializer
 from coevolution.populations.registries import initializer_registry
 
 @initializer_registry.register("zero_shot", population="code")
-class ZeroShotCodeInitializer(_CodeLLMHelpers, BaseLLMInitializer[CodeIndividual]):
+class ZeroShotCodeInitializer(CodeLLMHelpers, BaseLLMInitializer[CodeIndividual]):
     def initialize(self, problem: Problem, size: int | None = None) -> list[CodeIndividual]:
         # Your logic here...
         # Note: Use threads internally for parallel LLM calls

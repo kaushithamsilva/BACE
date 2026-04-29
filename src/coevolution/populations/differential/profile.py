@@ -25,11 +25,9 @@ from infrastructure.llm_client import LLMClient
 from infrastructure.sandbox.types import SandboxConfig
 
 from ..registries import profile_registry
+# Ensure decorators are run by importing the packages
+from . import initializers, operators  # noqa: F401
 from .helpers.finder import DifferentialFinder
-# Operators/Initializers imported here to ensure decorators are run
-from .operators.discovery import DifferentialDiscoveryOperator  # noqa: F401
-# Initializers imported here to ensure decorators are run
-from .initializers import DifferentialInitializer  # noqa: F401
 from .helpers.llm_service import DifferentialLLMService
 from .helpers.selector import FunctionallyEqSelector
 
