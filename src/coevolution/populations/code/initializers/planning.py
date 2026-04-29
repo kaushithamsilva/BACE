@@ -50,7 +50,7 @@ class PlanningInitializer(CodeLLMHelpers, BaseLLMInitializer[CodeIndividual]):
     def _call_generate_plan(self, problem: Problem) -> str:
         """Call LLM to generate an algorithmic plan."""
         plan_prompt = self.prompt_manager.render_prompt(
-            "initialization/plan_generate.j2",
+            "initialization/planning/plan_generate.j2",
             question_content=problem.question_content,
             starter_code=problem.starter_code,
         )
@@ -60,7 +60,7 @@ class PlanningInitializer(CodeLLMHelpers, BaseLLMInitializer[CodeIndividual]):
     def _call_generate_code(self, problem: Problem, plan: str) -> str:
         """Call LLM to generate code based on a plan."""
         code_prompt = self.prompt_manager.render_prompt(
-            "initialization/plan_to_code.j2",
+            "initialization/planning/plan_to_code.j2",
             question_content=problem.question_content,
             starter_code=problem.starter_code,
             plan=plan,
