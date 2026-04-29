@@ -236,6 +236,9 @@ class BaseLLMInitializer[T: BaseIndividual](
         super().__init__(llm, parser, language_name)
 
     @abstractmethod
+    def initializer_name(self) -> str: ...
+
+    @abstractmethod
     def initialize(self, problem: Problem, size: int | None = None) -> list[T]: ...
 
 

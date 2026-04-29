@@ -17,13 +17,8 @@ from ..helpers.llm_helpers import CodeLLMHelpers
 class DirectCodeInitializer(CodeLLMHelpers, BaseLLMInitializer[CodeIndividual]):
     """Creates Gen-0 code individuals via zero-shot LLM generation."""
 
-    def __init__(
-        self,
-        llm: ILanguageModel,
-        parser: ICodeParser,
-        language_name: str,
-    ) -> None:
-        super().__init__(llm, parser, language_name)
+    def initializer_name(self) -> str:
+        return "direct"
 
     def initialize(self, problem: Problem, size: int | None = None) -> list[CodeIndividual]:
         # This initializer produces individuals one-at-a-time. Parallelism 
@@ -44,6 +39,6 @@ class DirectCodeInitializer(CodeLLMHelpers, BaseLLMInitializer[CodeIndividual]):
                 creation_op=OPERATION_INITIAL,
                 generation_born=0,
                 explanation=self.parser.get_docstring(snip),
-                metadata={"initializer": self.__class__.__name__},
+                metadata={"initializer": self.initializer_name()},
             )
         ]

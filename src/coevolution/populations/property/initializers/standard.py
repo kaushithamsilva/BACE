@@ -67,6 +67,9 @@ class PropertyTestInitializer(BaseLLMInitializer[TestIndividual]):
     def llm_workers(self) -> int:
         return self._llm_workers
 
+    def initializer_name(self) -> str:
+        return "standard"
+
     # ── IPopulationInitializer ────────────────────────────────────────────────
 
     def initialize(self, problem: Problem, size: int | None = None) -> list[TestIndividual]:
@@ -165,7 +168,7 @@ class PropertyTestInitializer(BaseLLMInitializer[TestIndividual]):
                     metadata={
                         "pruning": "passed_public_io",
                         "description": description,
-                        "initializer": self.__class__.__name__,
+                        "initializer": self.initializer_name(),
                     },
                 )
             )

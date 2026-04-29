@@ -15,6 +15,9 @@ from coevolution.populations.registries import initializer_registry
 class DifferentialInitializer(BaseLLMInitializer[TestIndividual]):
     """Differential tests start empty — Gen 0 is always []."""
 
+    def initializer_name(self) -> str:
+        return "differential"
+
     def initialize(self, problem: Problem, size: int | None = None) -> list[TestIndividual]:
         logger.debug("DifferentialInitializer: starting with empty population")
         return []
