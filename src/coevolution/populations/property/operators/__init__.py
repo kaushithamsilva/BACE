@@ -2,7 +2,7 @@
 
 from .noop import NoOpOperator
 from .refiner import AdversarialPropertyRefiner
-from .validator import validate_property_test
+from ..helpers.validator import validate_property_test
 from .code_repair import PropertyCodeRepairOperator
 
 __all__ = [

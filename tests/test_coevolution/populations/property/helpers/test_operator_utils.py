@@ -12,7 +12,7 @@ import pytest
 
 from coevolution.core.interfaces.data import Test
 from coevolution.core.interfaces.language import ICodeParser, LanguageTransformationError
-from coevolution.populations.property.operators.helpers import (
+from coevolution.populations.property.helpers.operator_utils import (
     transform_public_tests,
     compose_property_test_script
 )

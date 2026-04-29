@@ -6,7 +6,7 @@ from coevolution.core.interfaces import Test
 from coevolution.core.interfaces.sandbox import ISandbox
 from infrastructure.languages import PythonLanguage
 
-from .helpers import compose_property_test_script
+from .operator_utils import compose_property_test_script
 
 
 def validate_property_test(

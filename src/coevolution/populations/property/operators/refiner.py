@@ -19,13 +19,14 @@ from coevolution.strategies.llm_base import (
     llm_retry,
 )
 
-from .helpers import transform_public_tests
+from ..helpers.operator_utils import transform_public_tests
 
 if TYPE_CHECKING:
     from coevolution.core.interfaces.language import ICodeParser
     from coevolution.core.interfaces.probability import IProbabilityAssigner
     from coevolution.core.interfaces.selection import IParentSelectionStrategy
     from coevolution.core.population import TestPopulation
+    from ..helpers.evaluator import PropertyTestEvaluator
 
 
 @operator_registry.register("adversarial_refiner", population="property")

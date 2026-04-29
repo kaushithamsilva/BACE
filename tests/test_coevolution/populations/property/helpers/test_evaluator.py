@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from coevolution.populations.property.evaluator import _property_eval_worker
+from coevolution.populations.property.helpers.evaluator import _property_eval_worker
 
 
 def test_property_eval_worker_sorting_and_early_break():
@@ -43,12 +43,12 @@ def test_property_eval_worker_sorting_and_early_break():
     mock_sandbox.execute_code.side_effect = side_effect
 
     with patch(
-        "coevolution.populations.property.evaluator.create_sandbox",
+        "coevolution.populations.property.helpers.evaluator.create_sandbox",
         return_value=mock_sandbox,
     ):
         # We need to mock compose_property_test_script to include input_arg so side_effect can see it
         with patch(
-            "coevolution.populations.property.evaluator.compose_property_test_script",
+            "coevolution.populations.property.helpers.evaluator.compose_property_test_script",
             side_effect=lambda s, i, o: f"test {s} with {i} -> {o}",
         ):
             code_id, test_id, result = _property_eval_worker(

@@ -26,7 +26,7 @@ from infrastructure.llm_client import LLMClient
 from infrastructure.sandbox import SandboxConfig
 
 from ..registries import profile_registry
-from .evaluator import PropertyTestEvaluator
+from .helpers.evaluator import PropertyTestEvaluator
 # Operators/Initializers imported here to ensure decorators are run
 from .operators import AdversarialPropertyRefiner  # noqa: F401
 from .initializers import PropertyTestInitializer  # noqa: F401

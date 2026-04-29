@@ -35,8 +35,8 @@ from coevolution.utils.logging import setup_logging
 from infrastructure.languages import PythonLanguage
 from infrastructure.sandbox import SandboxConfig, create_sandbox
 
-from .operators.helpers import compose_property_test_script
-from .types import IOPair, IOPairCache
+from .operator_utils import compose_property_test_script
+from ..types import IOPair, IOPairCache
 
 # ── Module-level pure worker functions ───────────────────────────────────────
 # These must be module-level (not methods) for multiprocessing pickling.

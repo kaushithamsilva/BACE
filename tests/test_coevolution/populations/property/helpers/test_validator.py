@@ -25,11 +25,11 @@ import io
 import textwrap
 from contextlib import redirect_stdout
 from typing import Any
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from coevolution.core.interfaces.data import BasicExecutionResult, Test
 from coevolution.core.interfaces.sandbox import ISandbox
-from coevolution.populations.property.operators.validator import validate_property_test
+from coevolution.populations.property.helpers.validator import validate_property_test
 
 # ── Shared test cases ──────────────────────────────────────────────────────────
 
