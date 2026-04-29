@@ -21,11 +21,11 @@ from coevolution.strategies.llm_base import (
     LLMSyntaxError,
     llm_retry,
 )
-from ..operators._helpers import _TestLLMHelpers
+from ..helpers.llm_helpers import UnittestLLMHelpers
 
 
 @initializer_registry.register("unittest", population="unittest")
-class UnittestInitializer(_TestLLMHelpers, BaseLLMInitializer[TestIndividual]):
+class UnittestInitializer(UnittestLLMHelpers, BaseLLMInitializer[TestIndividual]):
     """Creates Gen-0 test individuals via LLM.
 
     Asks for `population_size` tests in one shot and recovers

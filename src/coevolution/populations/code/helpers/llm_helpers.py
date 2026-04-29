@@ -1,4 +1,4 @@
-"""_CodeLLMHelpers — private mixin for code operator LLM utilities."""
+"""CodeLLMHelpers — mixin for code operator LLM utilities."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from coevolution.core.interfaces.language import ICodeParser
 from coevolution.strategies.llm_base import LLMSyntaxError
 
 
-class _CodeLLMHelpers:
+class CodeLLMHelpers:
     parser: ICodeParser  # provided by BaseLLMService
 
     def _extract_all_code_blocks(self, response: str) -> list[str]:

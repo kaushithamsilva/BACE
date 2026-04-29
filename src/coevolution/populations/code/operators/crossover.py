@@ -18,11 +18,11 @@ from coevolution.strategies.llm_base import (
     llm_retry,
 )
 
-from ._helpers import _CodeLLMHelpers
+from ..helpers.llm_helpers import CodeLLMHelpers
 
 
 @operator_registry.register("crossover", population="code")
-class CodeCrossoverOperator(_CodeLLMHelpers, BaseLLMOperator[CodeIndividual]):
+class CodeCrossoverOperator(CodeLLMHelpers, BaseLLMOperator[CodeIndividual]):
     """Crossover: select two parents → LLM combine → new CodeIndividual."""
 
     def operation_name(self) -> str:

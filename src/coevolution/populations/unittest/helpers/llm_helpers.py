@@ -1,4 +1,4 @@
-"""_TestLLMHelpers — private mixin for unittest operator LLM utilities."""
+"""UnittestLLMHelpers — mixin for unittest operator LLM utilities."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from coevolution.core.interfaces.language import ICodeParser, LanguageParsingErr
 from coevolution.strategies.llm_base import LLMSyntaxError
 
 
-class _TestLLMHelpers:
+class UnittestLLMHelpers:
     """Mixin: test-specific extraction utilities."""
 
     parser: ICodeParser  # provided by BaseLLMService

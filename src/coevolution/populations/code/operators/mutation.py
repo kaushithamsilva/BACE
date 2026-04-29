@@ -19,11 +19,11 @@ from coevolution.strategies.llm_base import (
     llm_retry,
 )
 
-from ._helpers import _CodeLLMHelpers
+from ..helpers.llm_helpers import CodeLLMHelpers
 
 
 @operator_registry.register("mutation", population="code")
-class CodeMutationOperator(_CodeLLMHelpers, BaseLLMOperator[CodeIndividual]):
+class CodeMutationOperator(CodeLLMHelpers, BaseLLMOperator[CodeIndividual]):
     """Mutation: select one parent → LLM rephrase → new CodeIndividual."""
 
     def operation_name(self) -> str:

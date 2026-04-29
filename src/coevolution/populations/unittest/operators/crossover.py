@@ -20,11 +20,11 @@ from coevolution.strategies.llm_base import (
     llm_retry,
 )
 from coevolution.populations.registries import operator_registry
-from ._helpers import _TestLLMHelpers
+from ..helpers.llm_helpers import UnittestLLMHelpers
 
 
 @operator_registry.register("crossover", population="unittest")
-class UnittestCrossoverOperator(_TestLLMHelpers, BaseLLMOperator[TestIndividual]):
+class UnittestCrossoverOperator(UnittestLLMHelpers, BaseLLMOperator[TestIndividual]):
     """Crossover: combine two parent tests → new TestIndividual."""
 
     def operation_name(self) -> str:

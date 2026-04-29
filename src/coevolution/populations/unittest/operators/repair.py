@@ -21,11 +21,11 @@ from coevolution.strategies.llm_base import (
     llm_retry,
 )
 from coevolution.populations.registries import operator_registry
-from ._helpers import _TestLLMHelpers
+from ..helpers.llm_helpers import UnittestLLMHelpers
 
 
 @operator_registry.register("repair", population="unittest")
-class UnittestRepairOperator(_TestLLMHelpers, BaseLLMOperator[TestIndividual]):
+class UnittestRepairOperator(UnittestLLMHelpers, BaseLLMOperator[TestIndividual]):
     """Repair: improve a test's discriminating power using passing/failing code context.
 
     Three edit modes (auto-selected by what interaction data is available):

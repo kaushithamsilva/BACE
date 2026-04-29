@@ -26,13 +26,13 @@ from coevolution.strategies.llm_base import (
 )
 from coevolution.strategies.selection.failing_test_selection import FailingTestSelector
 
-from ._helpers import _CodeLLMHelpers
+from ..helpers.llm_helpers import CodeLLMHelpers
 
 type TestPopulationType = str
 
 
 @operator_registry.register("generic_repair", population="code")
-class CodeGenericRepairOperator(_CodeLLMHelpers, BaseLLMOperator[CodeIndividual]):
+class CodeGenericRepairOperator(CodeLLMHelpers, BaseLLMOperator[CodeIndividual]):
     """Self-sufficient operator for feedback-driven mutation (Repair).
 
     On each execute(context) call:

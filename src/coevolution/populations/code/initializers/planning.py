@@ -10,11 +10,11 @@ from coevolution.core.interfaces import (
 from coevolution.core.interfaces.language import ICodeParser
 from coevolution.strategies.llm_base import BaseLLMInitializer, ILanguageModel
 from coevolution.populations.registries import initializer_registry
-from ..operators._helpers import _CodeLLMHelpers
+from ..helpers.llm_helpers import CodeLLMHelpers
 
 
 @initializer_registry.register("planning", population="code")
-class PlanningCodeInitializer(_CodeLLMHelpers, BaseLLMInitializer[CodeIndividual]):
+class PlanningCodeInitializer(CodeLLMHelpers, BaseLLMInitializer[CodeIndividual]):
     """Creates Gen-0 code individuals via a two-step Plan-then-Code process."""
 
     def __init__(
