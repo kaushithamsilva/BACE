@@ -1,5 +1,5 @@
 """Differential initializers package."""
 
-from .standard import DifferentialInitializer
+from .standard import BootstrappedInitializer
 
-__all__ = ["DifferentialInitializer"]
+__all__ = ["BootstrappedInitializer"]
