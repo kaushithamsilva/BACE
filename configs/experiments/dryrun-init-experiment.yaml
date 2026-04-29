@@ -1,0 +1,52 @@
+# Experiment: DryRUN Focused Initialization (No Differential)
+#
+# Rates:
+# - Direct: 0.2
+# - Planning: 0.3
+# - DryRUN: 0.5
+#
+# Differential testing is removed.
+
+experiment:
+  name: "dryrun-init-experiment"
+  description: "Experiment with custom initialization rates (Direct 0.2, Planning 0.3, DryRUN 0.5) and no differential testing."
+
+# ============================================================================
+# COMPONENT REFERENCES
+# ============================================================================
+
+llm: "llm/"
+code_profile: "profiles/code/dryrun_init.yaml"
+unittest_profile: "profiles/unittest/standard.yaml"
+# differential_profile: INTENTIONALLY OMITTED to remove differential testing
+public_profile: "profiles/public/standard.yaml"
+sandbox: "sandbox/sandbox-default.yaml"
+schedule: "schedules/alternating-10gen.yaml"
+
+# ============================================================================
+# DATASET CONFIGURATION
+# ============================================================================
+
+dataset:
+  version: "release_v6"
+  start_date: "2025-03-01"
+  end_date: "2025-05-10"
+  difficulty: "hard"
+
+# ============================================================================
+# PROBLEM SELECTION
+# ============================================================================
+
+subset:
+  start_index: 0
+  end_index: null  # null = process all
+  problem_ids: null  # null = use index range
+
+# ============================================================================
+# LOGGING CONFIGURATION
+# ============================================================================
+
+logging:
+  console_level: "DEBUG"
+  file_level: "DEBUG"
+  log_file_base_name: "dryrun_init_experiment"

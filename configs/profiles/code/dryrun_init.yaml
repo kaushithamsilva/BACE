@@ -1,0 +1,26 @@
+# DryRUN focused initialization profile
+# Custom rates: direct 0.2, planning 0.3, DryRUN 0.5
+
+initial_prior: 0.2
+initial_population_size: 10
+max_population_size: 15
+offspring_rate: 0.3
+elitism_rate: 0.3
+
+# Operation rates (must sum to 1.0)
+op_rates:
+  mutation: 0.4
+  crossover: 0.1
+  unittest_repair: 0.2
+  public_repair: 0.3
+
+# Initialization rates (must sum to 1.0)
+init_rates:
+  direct: 0.2
+  planning: 0.3
+  DryRUN: 0.5
+
+
+# Selection strategy
+diversity_enabled: true
+prob_assigner_strategy: "min"
