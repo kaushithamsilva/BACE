@@ -1,0 +1,38 @@
+{% import 'common/roles.j2' as roles %}
+
+{{ roles.coder_role() }}
+
+<problem>
+{{ question_content }}
+</problem>
+
+<current_solution>
+```{{ language }}
+{{ individual }}
+```
+</current_solution>
+
+<failing_tests_feedback>
+{% for test in failing_tests %}
+Failing Test #{{ loop.index }}:
+{{ test.snippet }}
+
+Error Trace:
+{{ test.trace }}
+{% if not loop.last %}
+---
+{% endif %}
+{% endfor %}
+</failing_tests_feedback>
+
+<simulation_trace>
+{{ simulation }}
+</simulation_trace>
+
+<task>
+Based on the mental simulation trace, the provided failing tests, and the problem description, please provide a refined and improved implementation plan.
+Focus on:
+1. Fixing any bugs or logic errors identified during the mental simulation and from the failing tests feedback.
+2. Adjusting the algorithmic steps to better handle the edge cases discovered.
+3. Improving the overall logic for clarity and efficiency.
+</task>

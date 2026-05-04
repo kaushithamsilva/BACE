@@ -1,0 +1,34 @@
+{% import 'common/roles.j2' as roles %}
+
+{{ roles.coder_role() }}
+
+<problem>
+{{ question_content }}
+</problem>
+
+<current_solution>
+```{{ language }}
+{{ individual }}
+```
+</current_solution>
+
+<failing_tests_feedback>
+{% for test in failing_tests %}
+Failing Test #{{ loop.index }}:
+{{ test.snippet }}
+
+Error Trace:
+{{ test.trace }}
+{% if not loop.last %}
+---
+{% endif %}
+{% endfor %}
+</failing_tests_feedback>
+
+<task>
+Please perform a "mental simulation" (dry run) of the current solution.
+1. **Select the SIMPLEST input** from the failing tests provided above that clearly demonstrates the bug. If all tests are complex, you may create an even simpler input that follows the problem constraints but fails.
+2. Trace the execution of the code line-by-line using that sample input.
+3. Keep track of the values of key variables at each step.
+4. Conclude whether the code produces the correct output for this specific input, and briefly note any apparent logic flaws or bugs discovered during the trace.
+</task>
