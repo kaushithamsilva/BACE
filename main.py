@@ -201,7 +201,11 @@ def run(
     # =================================================================
     # Generate run_id if not provided
     if run_id is None:
-        run_id = datetime.now().strftime("run_%Y%m%d_%H%M%S")
+        log_config = experiment_config.get("logging", {})
+        prefix = log_config.get("log_file_base_name", "run")
+        # Handle trailing underscores to avoid double underscores
+        separator = "" if prefix.endswith("_") else "_"
+        run_id = f"{prefix}{separator}{datetime.now().strftime('%Y%m%d_%H%M%S')}"
 
     log_config = experiment_config.get("logging", {})
     run_id = logging_utils.setup_logging(

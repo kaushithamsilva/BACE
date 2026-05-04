@@ -69,7 +69,12 @@ def setup_logging(
 
     # Generate/Resolve run_id (fallback to env for multiprocess workers)
     if run_id is None:
-        run_id = os.getenv("COEV_RUN_ID", uuid.uuid4().hex[:8])
+        run_id = os.getenv("COEV_RUN_ID")
+        if run_id is None:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            # Handle trailing underscores to avoid double underscores
+            separator = "" if log_file_base_name.endswith("_") else "_"
+            run_id = f"{log_file_base_name}{separator}{timestamp}"
 
     # Ensure run_id is path-safe before any existence checks or log setup
 
