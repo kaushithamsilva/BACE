@@ -4,26 +4,22 @@
 
 {{ roles.coder_role() }}
 
-<task>
-Generate a modified version of the provided code solution.
-1. First verify the correctness of the provided solution.
--- If any issues are found, fix them.
--- If no issues are found: 
-	i. Maintain the same functionality.
-	ii. Explore a different algorithmic approach or implementation style.
-	iii. Improve efficiency or clarity where possible.
-2. Write a concise docstring for the solution with a clear explanation of its approach and reasoning.
-</task>
-
 <problem>
 {{ question_content }}
 </problem>
 
-<candidate_solution>
+<current_solution>
 ```{{ language }}
 {{ individual }}
 ```
-</candidate_solution>
+</current_solution>
+
+Based on the problem description and the current code solution above, please provide a refined and improved complete Python solution. 
+Focus on:
+1. Fixing any potential bugs or edge cases.
+2. Improving algorithmic efficiency.
+3. Enhancing code clarity and style.
+4. Make sure that the starter code is implemented correctly.
 
 {{ starter.starter_code_block(starter_code, language) }}
 
