@@ -9,7 +9,6 @@ parent selection, LLM call, probability assignment, and individual construction.
 from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
-
 from typing import TYPE_CHECKING
 
 from loguru import logger
@@ -42,7 +41,7 @@ class Breeder[T: BaseIndividual]:
     All of that lives inside each operator.
     """
 
-    _MAX_CONSECUTIVE_FAILURES = 10
+    _MAX_CONSECUTIVE_FAILURES = 3
 
     def __init__(
         self,
@@ -75,7 +74,9 @@ class Breeder[T: BaseIndividual]:
         self._operators.extend(new_operators)
         self._op_weights = [ro.weight for ro in self._operators]
         self._op_list = [ro.operator for ro in self._operators]
-        logger.debug(f"Breeder: added {len(new_operators)} new operators. Total: {len(self._operators)}")
+        logger.debug(
+            f"Breeder: added {len(new_operators)} new operators. Total: {len(self._operators)}"
+        )
 
     def _sample_operator(self) -> "IOperator[T]":
         import random
