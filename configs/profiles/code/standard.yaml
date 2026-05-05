@@ -2,23 +2,24 @@
 # Balanced settings for code evolution
 
 initial_prior: 0.2
-initial_population_size: 10
-max_population_size: 15
+initial_population_size: 20
+max_population_size: 40
 offspring_rate: 0.3
 elitism_rate: 0.3
 
 # Operation rates (must sum to 1.0)
 op_rates:
-  mutation: 0.3
+  mutation: 0.4
   crossover: 0.1
   generic_repair: 0.0
-  unittest_repair: 0.4
-  property_repair: 0.0
-  public_repair: 0.2
+  unittest_repair: 0.2
+  public_repair: 0.3
 
 # Initialization rates (must sum to 1.0)
 init_rates:
-  direct: 1.0
+  direct: 0.2
+  planning: 0.3
+  DryRUN: 0.5
 
 # Performance settings
 init_pop_batch_size: 2
