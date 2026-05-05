@@ -5,7 +5,7 @@ base_url: "https://api.groq.com/openai/v1"
 
 # Experiment Parameters
 max_output_tokens: 100_000_000
-workers: 32
+workers: 10
 
 
 generation_params:
