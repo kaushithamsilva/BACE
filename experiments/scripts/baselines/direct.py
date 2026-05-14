@@ -194,7 +194,7 @@ def process_problem(
 @app.command()
 def run(
     llm: Path = typer.Option(
-        Path("configs/llm/gpt-5-mini.yaml"), help="Path to LLM config YAML"
+        Path("configs/llm/groq-gpt-oss-120b.yaml"), help="Path to LLM config YAML"
     ),
     count: Optional[int] = typer.Option(None, help="Number of problems to process"),
     difficulty: Optional[str] = typer.Option(

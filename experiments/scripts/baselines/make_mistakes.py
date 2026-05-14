@@ -56,7 +56,7 @@ Starter Code:
 Based on the problem description above, please provide a complete Python solution.
 Wrap your code in ```python blocks. Strictly stick to the Starter Code format. 
 
-CRITICAL: MAKE NO MISTAKES
+it's okay to make mistakes, just try your best
 """
 
 
@@ -207,11 +207,11 @@ def run(
         "2025-03-01", help="Start date (YYYY-MM-DD)"
     ),
     end_date: Optional[str] = typer.Option("2025-05-10", help="End date (YYYY-MM-DD)"),
-    output_dir: Path = typer.Option(Path("logs/make_no_mistakes"), help="Directory to save logs"),
+    output_dir: Path = typer.Option(Path("logs/make_mistakes"), help="Directory to save logs"),
     workers: int = typer.Option(16, help="Number of parallel workers"),
 ) -> None:
     run_id = datetime.now().strftime("%Y%m%d_%H%M%S") + "_" + str(uuid.uuid4())[:8]
-    log_file = output_dir / f"{run_id}_make_no_mistakes.txt"
+    log_file = output_dir / f"{run_id}_make_mistakes.txt"
     jsonl_file = output_dir / f"{run_id}_solutions.jsonl"
     config_file = output_dir / f"{run_id}_config.txt"
 
@@ -221,7 +221,7 @@ def run(
     # Initial Run Configuration Panel
     run_config_panel = Panel(
         Group(
-            f"Starting Make No Mistakes Code Generation Run: [bold cyan]{run_id}[/bold cyan]",
+            f"Starting Make Mistakes Code Generation Run: [bold cyan]{run_id}[/bold cyan]",
             f"Log file: [yellow]{log_file}[/yellow]",
             f"JSONL file: [yellow]{jsonl_file}[/yellow]",
             f"Config file: [yellow]{config_file}[/yellow]",
@@ -330,7 +330,7 @@ def run(
     console.print(usage_panel)
 
     # Final result table
-    table = Table(title="Make No Mistakes Results")
+    table = Table(title="Make Mistakes Results")
     table.add_column("Question ID", style="cyan")
     table.add_column("Status", style="bold")
 
