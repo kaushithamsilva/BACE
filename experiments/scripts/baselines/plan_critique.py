@@ -284,8 +284,7 @@ def run(
         Path("configs/llm/gpt-5-mini.yaml"), help="Path to LLM config YAML"
     ),
     count: Optional[int] = typer.Option(None, help="Number of problems to process"),
-    difficulty: str = typer.Option(
-        "hard", help="Difficulty of problems to load (easy, medium, hard)"
+    difficulty: Optional[str] = typer.Option(None, help="Difficulty of problems to load (easy, medium, hard)"
     ),
     version: str = typer.Option("release_v6", help="LCB dataset version"),
     start_date: Optional[str] = typer.Option(
@@ -317,7 +316,7 @@ def run(
     python_lang = PythonLanguage()
 
     # Load Dataset
-    diff_enum = Difficulty(difficulty.lower())
+    diff_enum = Difficulty(difficulty.lower()) if difficulty and difficulty.lower() != "none" else None
     problems = load_code_generation_dataset(
         release_version=version,
         difficulty=diff_enum,

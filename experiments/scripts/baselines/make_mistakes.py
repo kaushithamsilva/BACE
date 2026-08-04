@@ -258,7 +258,7 @@ def run(
     python_lang = PythonLanguage()
 
     # Load Dataset
-    diff_enum = Difficulty(difficulty.lower()) if difficulty else None
+    diff_enum = Difficulty(difficulty.lower()) if difficulty and difficulty.lower() != "none" else None if difficulty else None
     problems = load_code_generation_dataset(
         release_version=version,
         difficulty=diff_enum,

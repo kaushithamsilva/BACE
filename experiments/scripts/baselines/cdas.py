@@ -310,7 +310,7 @@ def process_problem(
 def run(
     llm: Path = typer.Option(Path("configs/llm/gpt-5-mini.yaml"), help="Path to LLM config YAML"),
     count: Optional[int] = typer.Option(None, help="Number of problems to process"),
-    difficulty: str = typer.Option("hard", help="Difficulty (easy, medium, hard)"),
+    difficulty: Optional[str] = typer.Option(None, help="Difficulty (easy, medium, hard)"),
     version: str = typer.Option("release_v6", help="LCB version"),
     start_date: Optional[str] = typer.Option("2025-03-01"),
     end_date: Optional[str] = typer.Option("2025-05-10"),
